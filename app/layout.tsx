@@ -31,7 +31,29 @@ export const metadata: Metadata = {
   keywords: ["sportswear", "women", "performance", "elegant", "fashion"],
   authors: [{ name: "Arinas" }],
   icons: {
-    icon: "/arinas-logo.png",
+    icon: "/icon.png",
+  },
+  openGraph: {
+    title: "Arinas | Elegant Performance Wear",
+    description: "Women’s sportswear brand for elegant performance. Look sharp, play sharper.",
+    url: "https://www.arinas.club",
+    siteName: "Arinas",
+    images: [
+      {
+        url: "/opengraph-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Arinas Storefront",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Arinas | Elegant Performance Wear",
+    description: "Women’s sportswear brand for elegant performance.",
+    images: ["/opengraph-image.png"],
   },
 };
 
