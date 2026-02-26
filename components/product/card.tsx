@@ -12,7 +12,7 @@ export function ProductCard({
   product: Product;
   isNew?: boolean;
 }) {
-  const price = product.priceRange.minVariantPrice;
+  const priceAmount = parseFloat(product.priceRange.minVariantPrice.amount);
   const images = product.images.edges.map((e) => e.node);
   const primaryImage = images[0];
   const secondaryImage = images[1];
@@ -26,7 +26,7 @@ export function ProductCard({
       onMouseLeave={() => setHovered(false)}
     >
       {/* Image Container */}
-      <div className="relative aspect-[2/3] w-full overflow-hidden bg-[#F2F0ED] mb-3">
+      <div className="relative aspect-2/3 w-full overflow-hidden bg-[#F2F0ED] mb-3">
         {/* Primary Image */}
         {primaryImage && (
           <Image
@@ -81,7 +81,7 @@ export function ProductCard({
           {product.title}
         </h3>
         <p className="text-sm text-brand-500">
-          ${parseFloat(price.amount).toFixed(2)}
+          L.E. {priceAmount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
         </p>
       </div>
     </Link>

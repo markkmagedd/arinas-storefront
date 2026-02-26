@@ -57,7 +57,7 @@ async function shopifyFetch<T>({
         ...(variables && { variables }),
       }),
       cache,
-      next: { revalidate: 3600, tags }, // 1 hour fallback; revalidated on-demand via webhook
+      next: { revalidate: 3600, ...(tags && tags.length > 0 ? { tags } : {}) },
     });
 
     const body = await result.json();
