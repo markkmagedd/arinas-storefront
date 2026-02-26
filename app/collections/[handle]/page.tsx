@@ -1,17 +1,8 @@
 import { getCollection, getProducts } from "@/lib/shopify";
 import { ProductCard } from "@/components/product/card";
-import { Suspense } from "react";
 import { notFound } from "next/navigation";
 
 export const runtime = "edge";
-
-function Grid({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="grid grid-cols-1 gap-y-12 gap-x-6 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8">
-      {children}
-    </div>
-  );
-}
 
 export async function generateMetadata({
   params,
@@ -67,29 +58,41 @@ export default async function CollectionPage({
   }
 
   return (
-    <section className="container mx-auto px-4 py-16 sm:px-6 lg:px-8">
-      <div className="mb-12 text-center max-w-2xl mx-auto">
-        <h1 className="font-display text-4xl font-bold tracking-tight text-brand-900 sm:text-5xl italic mb-4">
-          {title}
-        </h1>
+    <section className="min-h-screen bg-white">
+      {/* Page Header */}
+      <div className="border-b border-brand-100 pt-28 pb-8 px-4 sm:px-6 lg:px-8">
+        <div className="container mx-auto flex items-end justify-between">
+          <div>
+            <p className="text-xs text-brand-400 uppercase tracking-widest mb-2">Collection</p>
+            <h1 className="font-display text-4xl sm:text-5xl italic text-brand-900">
+              {title}
+            </h1>
+          </div>
+          <span className="text-sm text-brand-400 font-light pb-1">
+            {products.length} {products.length === 1 ? "item" : "items"}
+          </span>
+        </div>
         {description && (
-          <p className="mt-4 text-base text-brand-500 font-light max-w-prose mx-auto">
-            {description}
-          </p>
+          <div className="container mx-auto mt-3">
+            <p className="text-sm text-brand-400 max-w-lg">{description}</p>
+          </div>
         )}
       </div>
 
-      <Grid>
+      {/* Product Grid */}
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {products.length > 0 ? (
-          products.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))
+          <div className="grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
+            {products.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
         ) : (
-          <p className="col-span-full text-center text-brand-400 py-12">
-            No products found in this collection.
-          </p>
+          <div className="flex flex-col items-center justify-center py-32 text-center">
+            <p className="text-brand-300 text-sm uppercase tracking-widest">No products found</p>
+          </div>
         )}
-      </Grid>
+      </div>
     </section>
   );
 }
