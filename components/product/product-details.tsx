@@ -75,10 +75,7 @@ export function ProductDetails({ product }: { product: Product }) {
     }
   };
 
-  const formattedPrice = new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: price.currencyCode,
-  }).format(parseFloat(price.amount));
+  const formattedPrice = `L.E. ${parseFloat(price.amount).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
   return (
     <div className="flex flex-col gap-7">
