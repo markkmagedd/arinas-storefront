@@ -1,36 +1,81 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Arinas Headless Storefront
 
-## Getting Started
+A premium, elegant performance wear storefront built with **Next.js 14+ (App Router)**, **Tailwind CSS v4**, and **Shopify Storefront API**.
 
-First, run the development server:
+## 🎨 Brand Identity Integration
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **Primary Colors**: Deep Navy (`#1B2A41`) for confidence and strength.
+- **Secondary**: Soft Pink (`#FADEE2`) for feminine balance.
+- **Typography**:
+  - _Headings_: **Glory** (via `Instrument Serif` / Google Fonts variable) - Heavy, Italic, impactful.
+  - _Body_: **Open Sans** - Clean, legible, modern.
+- **Visual Style**: Minimal, editorial layouts with generous whitespace to evoke luxury and calm performance. "Look sharp. Play sharper."
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🚀 Tech Stack
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Framework**: Next.js 15 (App Router, Server Components)
+- **Styling**: Tailwind CSS v4 (Zero-runtime, CSS Variables theme)
+- **CMS/Backend**: Shopify (Headless via Storefront API)
+- **Icons**: Lucide React
+- **Animation**: Framer Motion (ready for use)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🛠️ Setup Instructions
 
-## Learn More
+1. **Install Dependencies**
 
-To learn more about Next.js, take a look at the following resources:
+   ```bash
+   npm install
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+2. **Environment Variables**
+   Create a `.env.local` file in the root:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+   ```bash
+   SHOPIFY_STORE_DOMAIN="your-store.myshopify.com"
+   SHOPIFY_STOREFRONT_ACCESS_TOKEN="your_storefront_access_token"
+   ```
 
-## Deploy on Vercel
+3. **Run Development Server**
+   ```bash
+   npm run dev
+   ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 📂 Project Structure
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `app/` - App Router pages and layouts.
+  - `page.tsx` - Home page (Hero, Featured, Story).
+  - `collections/[handle]/` - Collection pages.
+  - `products/[handle]/` - Product details.
+- `components/`
+  - `ui/` - Reusable UI atoms (Button, Title).
+  - `layout/` - Header, Footer.
+  - `product/` - Gallery, Details, Card.
+  - `cart/` - Cart Context and Drawer.
+- `lib/shopify/` - API Client and Queries.
+  - `index.ts` - Fetch wrapper with Next.js caching.
+  - `queries.ts` - GraphQL queries.
+  - `types.ts` - TypeScript definitions.
+
+## 📦 Deployment
+
+Deploy to **Vercel**:
+
+1. Push to GitHub.
+2. Import project in Vercel.
+3. Add Environment Variables (`SHOPIFY_STORE_DOMAIN`, `SHOPIFY_STOREFRONT_ACCESS_TOKEN`).
+4. `npm run build` is handled automatically.
+
+## 🎨 Design Decisions
+
+- **Why Server Components?**
+  We fetch products on the server for best SEO and LCP performance. Client components (`use client`) are used only for interactive elements like the Gallery, Size Selector, and Cart.
+
+- **Why Tailwind v4?**
+  Performance and modern CSS features. We use CSS variables in `globals.css` to define the design tokens (`--color-brand-900`, `--font-display`), making them easily adjustable.
+
+- **Cart State**
+  Managed via `CartProvider` (React Context) wrapping the layout. This allows the cart content to persist navigation and update instantly.
+
+---
+
+_This storefront is designed to be headless. Ensure your Shopify store has the "Headless" sales channel installed and products are published to it._
