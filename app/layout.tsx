@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Instrument_Serif, Open_Sans } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { Suspense } from "react";
@@ -7,17 +7,31 @@ import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { CartProvider } from "@/components/cart/cart-context";
 
-// Using Instrument Serif as closest free alternative to Glory Heavy Italic mood or similar display font
-const instrumentSerif = Instrument_Serif({
-  variable: "--font-glory",
-  subsets: ["latin"],
-  weight: "400",
-  style: ["italic", "normal"],
+const gilroy = localFont({
+  src: [
+    {
+      path: "../public/fonts/Gilroy-Regular.ttf",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../public/fonts/Gilroy-Medium.ttf",
+      weight: "500",
+      style: "normal",
+    },
+    {
+      path: "../public/fonts/Gilroy-Bold.ttf",
+      weight: "700",
+      style: "normal",
+    },
+  ],
+  variable: "--font-open-sans", // Keeping the variable name to avoid breaking existing tailwind classes
+  display: "swap",
 });
 
-const openSans = Open_Sans({
-  variable: "--font-open-sans",
-  subsets: ["latin"],
+const zalando = localFont({
+  src: "../public/fonts/ZalandoSansExpanded-VariableFont_wght.ttf",
+  variable: "--font-glory", // Keeping the variable name to avoid breaking existing tailwind classes
   display: "swap",
 });
 
@@ -63,7 +77,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={cn(instrumentSerif.variable, openSans.variable)}>
+    <html lang="en" className={cn(zalando.variable, gilroy.variable)}>
       <body className="min-h-screen font-sans antialiased text-brand-900 bg-white selection:bg-brand-50 selection:text-brand-900">
         <CartProvider>
           <main className="flex min-h-screen flex-col">
