@@ -3,14 +3,20 @@
 import Link from "next/link";
 import { Menu, Search, ShoppingBag, User } from "lucide-react";
 import { useState, useEffect } from "react";
-import { usePathname } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { useCart } from "@/components/cart/cart-context";
 
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const router = useRouter();
+  const { openCart, cart } = useCart();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -22,7 +28,16 @@ export function Header() {
 
   useEffect(() => {
     setIsMobileMenuOpen(false);
-  }, [pathname]);
+    setIsSearchOpen(false);
+  }, [pathname, searchParams]);
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
+      setIsSearchOpen(false);
+    }
+  };
 
   return (
     <header
@@ -33,7 +48,7 @@ export function Header() {
           : "bg-transparent py-5",
       )}
     >
-      <div className="container mx-auto px-4 md:px-6 flex items-center justify-between">
+      <div className="container mx-auto px-4 md:px-6 flex items-center justify-between relative">
         {/* Mobile Menu Trigger */}
         <button
           className="md:hidden p-2 -ml-2 text-brand-900"
@@ -79,20 +94,45 @@ export function Header() {
 
         {/* Icons */}
         <div className="flex items-center gap-2 md:gap-4">
-          <button className="p-2 text-brand-900 hover:text-brand-600 transition-colors hidden sm:block">
-            <Search className="h-5 w-5" />
-          </button>
+          {isSearchOpen ? (
+            <form onSubmit={handleSearchSubmit} className="absolute right-12 top-1/2 -translate-y-1/2 bg-white flex items-center shadow-lg rounded-sm border border-brand-100 overflow-hidden">
+                <input 
+                  type="text" 
+                  placeholder="Search..." 
+                  className="pl-3 py-1 outline-none text-sm w-32 md:w-48"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  autoFocus
+                />
+                <button type="submit" className="p-2 hover:bg-brand-50">
+                  <Search className="h-4 w-4 text-brand-900" />
+                </button>
+            </form>
+          ) : (
+            <button 
+              className="p-2 text-brand-900 hover:text-brand-600 transition-colors hidden sm:block"
+              onClick={() => setIsSearchOpen(true)}
+            >
+              <Search className="h-5 w-5" />
+            </button>
+          )}
+
           <Link
             href="/account"
             className="p-2 text-brand-900 hover:text-brand-600 transition-colors hidden sm:block"
           >
             <User className="h-5 w-5" />
           </Link>
-          <button className="p-2 text-brand-900 hover:text-brand-600 transition-colors relative">
+          <button 
+            className="p-2 text-brand-900 hover:text-brand-600 transition-colors relative"
+            onClick={openCart}
+          >
             <ShoppingBag className="h-5 w-5" />
-            <span className="absolute top-1 right-0 h-4 w-4 bg-brand-900 text-white text-[10px] flex items-center justify-center rounded-full font-bold">
-              0
-            </span>
+            {(cart?.totalQuantity || 0) > 0 && (
+              <span className="absolute top-1 right-0 h-4 w-4 bg-brand-900 text-white text-[10px] flex items-center justify-center rounded-full font-bold">
+                {cart?.totalQuantity}
+              </span>
+            )}
           </button>
         </div>
       </div>
