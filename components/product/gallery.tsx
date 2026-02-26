@@ -1,11 +1,13 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { Image as ShopifyImage, ProductVariant } from "@/lib/shopify/types";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useSearchParams } from "next/navigation";
+
+const COLOR_KEYWORDS = ["color", "colour", "shade", "finish", "tone"];
 
 export function ProductGallery({ 
   images, 
@@ -17,46 +19,86 @@ export function ProductGallery({
   const [selected, setSelected] = useState(0);
   const searchParams = useSearchParams();
 
-  // Update selected image when variant changes via URL params
+  // Filter images to only show ones matching the selected color variant
+  const filteredImages = useMemo(() => {
+    if (!variants || !variants.length) return images;
+
+    // Find the color option name
+    const colorOption = variants[0]?.selectedOptions.find((opt) =>
+      COLOR_KEYWORDS.some((k) => opt.name.toLowerCase().includes(k))
+    );
+    if (!colorOption) return images;
+
+    const selectedColor = searchParams.get(colorOption.name.toLowerCase());
+    if (!selectedColor) return images;
+
+    // Collect image URLs for variants matching the selected color
+    const colorImageUrls = new Set<string>();
+    variants.forEach((variant) => {
+      const variantColor = variant.selectedOptions.find(
+        (o) => o.name === colorOption.name
+      )?.value;
+      if (variantColor === selectedColor && variant.image?.url) {
+        colorImageUrls.add(variant.image.url);
+      }
+    });
+
+    if (colorImageUrls.size === 0) return images;
+
+    // Also include any product images not assigned to any variant (e.g. lifestyle shots)
+    const allVariantImageUrls = new Set<string>();
+    variants.forEach((v) => {
+      if (v.image?.url) allVariantImageUrls.add(v.image.url);
+    });
+
+    const filtered = images.filter(
+      (img) => colorImageUrls.has(img.url) || !allVariantImageUrls.has(img.url)
+    );
+
+    return filtered.length > 0 ? filtered : images;
+  }, [images, variants, searchParams]);
+
+  // Update selected image when variant/filtered images change
   useEffect(() => {
-    if (!variants || !images.length) return;
+    if (!variants || !filteredImages.length) return;
     
-    // Find the currently selected variant based on URL params
     const currentVariant = variants.find((variant) => {
       return variant.selectedOptions.every(
         (option) => searchParams.get(option.name.toLowerCase()) === option.value
       );
     });
 
-    // If the variant has a specific image, find its index in the images array
     if (currentVariant?.image) {
-      const imageIndex = images.findIndex(
+      const imageIndex = filteredImages.findIndex(
         (img) => img.url === currentVariant.image?.url
       );
       if (imageIndex !== -1) {
         setSelected(imageIndex);
+        return;
       }
     }
-  }, [searchParams, variants, images]);
+    // Reset to first image if current selection is out of bounds
+    setSelected(0);
+  }, [searchParams, variants, filteredImages]);
 
   const prev = useCallback(
-    () => setSelected((i) => (i === 0 ? images.length - 1 : i - 1)),
-    [images.length],
+    () => setSelected((i) => (i === 0 ? filteredImages.length - 1 : i - 1)),
+    [filteredImages.length],
   );
   const next = useCallback(
-    () => setSelected((i) => (i === images.length - 1 ? 0 : i + 1)),
-    [images.length],
+    () => setSelected((i) => (i === filteredImages.length - 1 ? 0 : i + 1)),
+    [filteredImages.length],
   );
 
-  if (!images.length) return <div className="aspect-3/4 bg-brand-50" />;
+  if (!filteredImages.length) return <div className="aspect-3/4 bg-brand-50" />;
 
   return (
     <div className="flex flex-col gap-3">
       {/* Main image + arrows */}
       <div className="relative aspect-3/4 w-full bg-brand-50 overflow-hidden group">
         <Image
-          src={images[selected].url}
-          alt={images[selected].altText || "Product image"}
+          src={filteredImages[selected]?.url ?? filteredImages[0].url}
+          alt={filteredImages[selected]?.altText || "Product image"}
           fill
           priority
           className="object-cover transition-opacity duration-300"
@@ -64,7 +106,7 @@ export function ProductGallery({
         />
 
         {/* Prev */}
-        {images.length > 1 && (
+        {filteredImages.length > 1 && (
           <>
             <button
               onClick={prev}
@@ -87,7 +129,7 @@ export function ProductGallery({
 
             {/* Dot indicator */}
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5">
-              {images.map((_, idx) => (
+              {filteredImages.map((_, idx) => (
                 <button
                   key={idx}
                   onClick={() => setSelected(idx)}
@@ -107,9 +149,9 @@ export function ProductGallery({
       </div>
 
       {/* Thumbnail strip */}
-      {images.length > 1 && (
+      {filteredImages.length > 1 && (
         <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
-          {images.map((image, idx) => (
+          {filteredImages.map((image, idx) => (
             <button
               key={image.url}
               onClick={() => setSelected(idx)}
