@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { revalidateTag } from "next/cache";
+import { revalidatePath } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 
 // Shopify sends a base64-encoded HMAC-SHA256 of the raw request body
@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
 
   // Revalidate all cached Shopify data immediately.
   // Every product, collection, and listing page will refresh on the next visit.
-  revalidateTag("shopify");
+  revalidatePath("/", "layout");
 
   return NextResponse.json({ revalidated: true, now: Date.now() });
 }
