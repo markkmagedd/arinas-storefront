@@ -34,7 +34,7 @@ export function ProductDetails({ product }: { product: Product }) {
     const paramsOptions: Record<string, string> = {};
     let hasParams = false;
     
-    filteredOptions.forEach((option) => {
+    product.options.forEach((option) => {
       const paramValue = searchParams.get(option.name.toLowerCase());
       if (paramValue) {
         paramsOptions[option.name] = paramValue;
@@ -52,13 +52,20 @@ export function ProductDetails({ product }: { product: Product }) {
     return Object.fromEntries(
       firstVariant.selectedOptions.map((o) => [o.name, o.value]),
     );
-  }, [product.id, searchParams, filteredOptions]);
+  }, [product.id, searchParams, product.options]);
 
   const [selectedOptions, setSelectedOptions] =
     useState<Record<string, string>>(buildInitialOptions);
 
   useEffect(() => {
-    setSelectedOptions(buildInitialOptions());
+    const newOptions = buildInitialOptions();
+    setSelectedOptions((prev) => {
+      // Only update if options actually changed to prevent infinite loops
+      const hasChanged = Object.keys(newOptions).some(
+        (key) => newOptions[key] !== prev[key]
+      );
+      return hasChanged ? newOptions : prev;
+    });
   }, [buildInitialOptions]);
 
   const selectedVariant = product.variants.edges.find((edge) =>
