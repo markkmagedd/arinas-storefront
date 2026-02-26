@@ -101,21 +101,24 @@ export function Header() {
         {/* Icons */}
         <div className="flex items-center gap-2 md:gap-4">
           {isSearchOpen ? (
-            <form onSubmit={handleSearchSubmit} className="absolute right-12 top-1/2 -translate-y-1/2 bg-white flex items-center shadow-lg rounded-sm border border-brand-100 overflow-hidden">
-                <input 
-                  type="text" 
-                  placeholder="Search..." 
-                  className="pl-3 py-1 outline-none text-sm w-32 md:w-48"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  autoFocus
-                />
-                <button type="submit" className="p-2 hover:bg-brand-50">
-                  <Search className="h-4 w-4 text-brand-900" />
-                </button>
+            <form
+              onSubmit={handleSearchSubmit}
+              className="absolute right-12 top-1/2 -translate-y-1/2 bg-white flex items-center shadow-lg rounded-sm border border-brand-100 overflow-hidden"
+            >
+              <input
+                type="text"
+                placeholder="Search..."
+                className="pl-3 py-1 outline-none text-sm w-32 md:w-48"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                autoFocus
+              />
+              <button type="submit" className="p-2 hover:bg-brand-50">
+                <Search className="h-4 w-4 text-brand-900" />
+              </button>
             </form>
           ) : (
-            <button 
+            <button
               className="p-2 text-brand-900 hover:text-brand-600 transition-colors hidden sm:block"
               onClick={() => setIsSearchOpen(true)}
             >
@@ -129,7 +132,7 @@ export function Header() {
           >
             <User className="h-5 w-5" />
           </Link>
-          <button 
+          <button
             className="p-2 text-brand-900 hover:text-brand-600 transition-colors relative"
             onClick={openCart}
           >
