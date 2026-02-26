@@ -18,8 +18,12 @@ export function ProductDetails({ product }: { product: Product }) {
     );
   })?.node;
 
-  const isAvailable = selectedVariant?.availableForSale ?? false;
-  const price = selectedVariant?.price ?? product.priceRange.minVariantPrice;
+  // If no variant is selected yet, default to the first available variant to check overall availability
+  const defaultVariant = product.variants.edges.find((edge) => edge.node.availableForSale)?.node || product.variants.edges[0]?.node;
+  const currentVariant = selectedVariant || defaultVariant;
+
+  const isAvailable = currentVariant?.availableForSale ?? false;
+  const price = currentVariant?.price ?? product.priceRange.minVariantPrice;
 
   const handleOptionChange = (name: string, value: string) => {
     setSelectedOptions((prev) => ({ ...prev, [name]: value }));
@@ -78,7 +82,7 @@ export function ProductDetails({ product }: { product: Product }) {
         size="lg"
         className="w-full mt-4 h-14 text-lg"
         onClick={addToCart}
-        disabled={!selectedVariant || !isAvailable}
+        disabled={!isAvailable}
       >
         {isAvailable ? (
           <>
