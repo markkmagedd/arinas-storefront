@@ -36,6 +36,11 @@ const zalando = localFont({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : "http://localhost:3000"
+  ),
   title: {
     default: "Arinas | Elegant Performance Wear",
     template: "%s | Arinas",
