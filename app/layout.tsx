@@ -39,7 +39,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.VERCEL_URL
       ? `https://${process.env.VERCEL_URL}`
-      : "http://localhost:3000"
+      : "http://localhost:3000",
   ),
   title: {
     default: "Arinas | Elegant Performance Wear",
@@ -54,7 +54,8 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "Arinas | Elegant Performance Wear",
-    description: "Women’s sportswear brand for elegant performance. Look sharp, play sharper.",
+    description:
+      "Women’s sportswear brand for elegant performance. Look sharp, play sharper.",
     url: "https://www.arinas.club",
     siteName: "Arinas",
     images: [
