@@ -29,11 +29,13 @@ async function shopifyFetch<T>({
   variables,
   headers,
   cache = "force-cache",
+  tags,
 }: {
   query: string;
   variables?: object;
   headers?: HeadersInit;
   cache?: RequestCache;
+  tags?: string[];
 }): Promise<{ status: number; body: T } | never> {
   if (!domain || !accessToken) {
     if (process.env.NODE_ENV === "production") {
@@ -55,7 +57,7 @@ async function shopifyFetch<T>({
         ...(variables && { variables }),
       }),
       cache,
-      next: { revalidate: 900 }, // 15 minutes
+      next: { revalidate: 3600, tags }, // 1 hour fallback; revalidated on-demand via webhook
     });
 
     const body = await result.json();
@@ -94,6 +96,7 @@ export async function getProducts({
         reverse,
         sortKey,
       },
+      tags: ["shopify", "shopify-products"],
     });
 
     return res.body.data.products.edges.map((edge) => edge.node);
@@ -110,6 +113,7 @@ export async function getProduct(handle: string): Promise<Product | undefined> {
       variables: {
         handle,
       },
+      tags: ["shopify", "shopify-products", `shopify-product-${handle}`],
     });
 
     return res.body.data.product;
@@ -123,6 +127,7 @@ export async function getCollections(): Promise<Collection[]> {
   try {
     const res = await shopifyFetch<ShopifyCollectionsOperation>({
       query: getCollectionsQuery,
+      tags: ["shopify", "shopify-collections"],
     });
 
     return res.body.data.collections.edges.map((edge) => edge.node);
@@ -141,6 +146,7 @@ export async function getCollection(
       variables: {
         handle,
       },
+      tags: ["shopify", "shopify-collections", `shopify-collection-${handle}`],
     });
 
     return res.body.data.collection;
