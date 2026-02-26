@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   keywords: ["sportswear", "women", "performance", "elegant", "fashion"],
   authors: [{ name: "Arinas" }],
   icons: {
-    icon: "/arinas-icon.png",
+    icon: "/arinas-logo.png",
   },
 };
 

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Menu, Search, ShoppingBag, User } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
@@ -59,9 +60,14 @@ export function Header() {
 
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
-          <span className="font-display font-bold text-2xl md:text-3xl tracking-tight text-brand-900 uppercase italic">
-            Arinas
-          </span>
+          <Image
+            src="/arinas-logo.png"
+            alt="Arinas"
+            width={120}
+            height={40}
+            className="h-8 md:h-10 w-auto"
+            priority
+          />
         </Link>
 
         {/* Desktop Navigation */}
