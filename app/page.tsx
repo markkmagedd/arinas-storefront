@@ -2,7 +2,7 @@ import { Hero } from "@/components/hero";
 import { Button, buttonVariants } from "@/components/ui/button";
 import Link from "next/link";
 import { getProducts } from "@/lib/shopify";
-import Image from "next/image";
+import { ProductCard } from "@/components/product/card";
 
 export default async function Home() {
   const products = await getProducts({ sortKey: "CREATED_AT", reverse: true });
@@ -32,50 +32,8 @@ export default async function Home() {
 
         {/* Product Grid from Shopify */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 gap-y-12">
-          {products.slice(0, 3).map((product) => (
-            <Link
-              key={product.handle}
-              href={`/products/${product.handle}`}
-              className="group cursor-pointer block"
-            >
-              <div className="relative aspect-[3/4] bg-brand-50 w-full overflow-hidden rounded-sm mb-4">
-                {product.featuredImage ? (
-                  <Image
-                    src={product.featuredImage.url}
-                    alt={product.featuredImage.altText || product.title}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 33vw"
-                  />
-                ) : (
-                  <div className="absolute inset-0 bg-brand-100 flex items-center justify-center text-brand-300 font-sans font-light">
-                    No Image
-                  </div>
-                )}
-                <div className="absolute bottom-4 left-4 right-4 translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
-                  <Button className="w-full bg-white text-brand-900 hover:bg-brand-50 shadow-md font-bold text-xs uppercase tracking-wider">
-                    Quick Add
-                  </Button>
-                </div>
-              </div>
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="font-sans font-medium text-brand-900 group-hover:text-brand-600 transition-colors">
-                    {product.title}
-                  </h3>
-                  <p className="text-xs text-brand-500 font-light mt-1 w-full truncate">
-                    {/* Short description or tag could go here */}
-                    Latest Collection
-                  </p>
-                </div>
-                <span className="font-mono text-sm text-brand-900">
-                  $
-                  {parseFloat(
-                    product.priceRange.minVariantPrice.amount,
-                  ).toFixed(2)}
-                </span>
-              </div>
-            </Link>
+          {products.slice(0, 3).map((product, i) => (
+            <ProductCard key={product.handle} product={product} isNew={i === 0} />
           ))}
         </div>
       </section>
@@ -126,7 +84,7 @@ export default async function Home() {
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div className="aspect-square bg-brand-accent rounded-lg relative overflow-hidden shadow-xl">
             {/* Image placeholder */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-brand-900/40 to-brand-900/10 flex items-end p-8">
+            <div className="absolute inset-0 bg-linear-to-tr from-brand-900/40 to-brand-900/10 flex items-end p-8">
               <span className="text-white font-display text-4xl md:text-5xl italic drop-shadow-md">
                 In My
                 <br />

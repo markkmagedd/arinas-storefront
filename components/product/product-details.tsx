@@ -3,16 +3,23 @@
 import { useState, useEffect, useCallback } from "react";
 import { Product, ProductOption } from "@/lib/shopify/types";
 import { cn } from "@/lib/utils";
-import { ShoppingBag, Loader2, Check } from "lucide-react";
+import { Loader2, Check, Truck, ChevronDown } from "lucide-react";
 import { useCart } from "@/components/cart/cart-context";
 
 const HIDDEN_OPTION = "Default Title";
+// Heuristic: treat options whose name contains these words as "colour" selectors
+const COLOR_KEYWORDS = ["color", "colour", "shade", "finish", "tone"];
 
 type AddState = "idle" | "adding" | "added";
+
+function isColorOption(name: string) {
+  return COLOR_KEYWORDS.some((k) => name.toLowerCase().includes(k));
+}
 
 export function ProductDetails({ product }: { product: Product }) {
   const { addItem } = useCart();
   const [addState, setAddState] = useState<AddState>("idle");
+  const [descOpen, setDescOpen] = useState(false);
 
   const filteredOptions = product.options.filter(
     (o) => !(o.values.length === 1 && o.values[0] === HIDDEN_OPTION),
@@ -28,9 +35,8 @@ export function ProductDetails({ product }: { product: Product }) {
     );
   }, [product.id]);
 
-  const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>(
-    buildInitialOptions,
-  );
+  const [selectedOptions, setSelectedOptions] =
+    useState<Record<string, string>>(buildInitialOptions);
 
   useEffect(() => {
     setSelectedOptions(buildInitialOptions());
@@ -48,20 +54,17 @@ export function ProductDetails({ product }: { product: Product }) {
   const isAvailable = currentVariant?.availableForSale ?? false;
   const price = currentVariant?.price ?? product.priceRange.minVariantPrice;
 
-  // Check if a specific value is available in any variant given current other selections
-  const isValueAvailable = (optionName: string, value: string) => {
-    return product.variants.edges.some((edge) => {
+  const isValueAvailable = (optionName: string, value: string) =>
+    product.variants.edges.some((edge) => {
       const v = edge.node;
       if (!v.availableForSale) return false;
       return v.selectedOptions.every((o) =>
         o.name === optionName ? o.value === value : selectedOptions[o.name] === o.value,
       );
     });
-  };
 
-  const handleOptionChange = (name: string, value: string) => {
+  const handleOptionChange = (name: string, value: string) =>
     setSelectedOptions((prev) => ({ ...prev, [name]: value }));
-  };
 
   const addToCart = async () => {
     if (!currentVariant || addState !== "idle") return;
@@ -69,121 +72,140 @@ export function ProductDetails({ product }: { product: Product }) {
     try {
       await addItem(currentVariant.id);
       setAddState("added");
-      setTimeout(() => setAddState("idle"), 2000);
+      setTimeout(() => setAddState("idle"), 2500);
     } catch {
       setAddState("idle");
     }
   };
 
-  const formattedPrice = `L.E. ${parseFloat(price.amount).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  const formattedPrice = `L.E. ${parseFloat(price.amount).toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
 
   return (
-    <div className="flex flex-col gap-7">
+    <div className="flex flex-col divide-y divide-brand-100">
 
       {/* Title + Price */}
-      <div className="flex flex-col gap-1">
-        <h1 className="text-3xl md:text-4xl font-display font-bold text-brand-900 leading-tight">
+      <div className="pb-6">
+        <h1 className="text-2xl md:text-3xl font-display font-bold text-brand-900 leading-snug mb-3">
           {product.title}
         </h1>
-        <div className="flex items-baseline gap-3 mt-2">
-          <span className="text-2xl font-semibold text-brand-900 tracking-tight">
-            {formattedPrice}
-          </span>
-          {isAvailable ? (
-            <span className="text-xs uppercase tracking-widest text-brand-accent font-medium">
-              In Stock
-            </span>
-          ) : (
-            <span className="text-xs uppercase tracking-widest text-red-400 font-medium">
-              Out of Stock
-            </span>
-          )}
-        </div>
+        <p className="text-lg font-medium text-brand-900">{formattedPrice}</p>
       </div>
 
-      {/* Option Selectors */}
+      {/* Options */}
       {filteredOptions.length > 0 && (
-        <div className="flex flex-col gap-5">
-          {filteredOptions.map((option: ProductOption) => (
-            <div key={option.id}>
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-bold uppercase tracking-widest text-brand-900">
-                  {option.name}
-                </span>
-                <span className="text-xs text-brand-accent uppercase tracking-widest">
-                  {selectedOptions[option.name]}
-                </span>
+        <div className="py-6 flex flex-col gap-6">
+          {filteredOptions.map((option: ProductOption) => {
+            const isColor = isColorOption(option.name);
+            const selectedValue = selectedOptions[option.name];
+            return (
+              <div key={option.id}>
+                {/* Label row */}
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-sm font-semibold text-brand-900 capitalize">
+                    {isColor ? option.name : `Select ${option.name}`}
+                  </span>
+                  {selectedValue && (
+                    <span className="text-sm text-brand-500">{selectedValue}</span>
+                  )}
+                </div>
+
+                {/* Values */}
+                <div className="flex flex-wrap gap-2">
+                  {option.values.map((value) => {
+                    const isSelected = selectedOptions[option.name] === value;
+                    const available = isValueAvailable(option.name, value);
+                    return (
+                      <button
+                        key={value}
+                        onClick={() => available && handleOptionChange(option.name, value)}
+                        disabled={!available}
+                        title={!available ? "Out of stock" : value}
+                        className={cn(
+                          "relative min-w-12 px-4 py-2 text-sm font-medium border transition-all duration-150",
+                          isSelected
+                            ? "border-brand-900 bg-white text-brand-900 ring-1 ring-brand-900"
+                            : available
+                              ? "border-brand-200 text-brand-900 hover:border-brand-900 bg-white"
+                              : "border-brand-100 text-brand-900/25 bg-white cursor-not-allowed",
+                          !available && "after:absolute after:inset-0 after:bg-[linear-gradient(to_top_right,transparent_calc(50%-0.5px),#e5e7eb,transparent_calc(50%+0.5px))]",
+                        )}
+                      >
+                        {value}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-              <div className="flex flex-wrap gap-2">
-                {option.values.map((value) => {
-                  const isSelected = selectedOptions[option.name] === value;
-                  const available = isValueAvailable(option.name, value);
-                  return (
-                    <button
-                      key={value}
-                      onClick={() => available && handleOptionChange(option.name, value)}
-                      disabled={!available}
-                      className={cn(
-                        "relative min-w-12 px-4 py-2 text-sm font-medium border transition-all duration-150",
-                        isSelected
-                          ? "border-brand-900 bg-brand-900 text-white"
-                          : available
-                          ? "border-brand-200 text-brand-900 hover:border-brand-900 bg-white"
-                          : "border-brand-100 text-brand-900/30 bg-white cursor-not-allowed line-through",
-                      )}
-                    >
-                      {value}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
-      {/* Add to Cart */}
-      <button
-        onClick={addToCart}
-        disabled={!isAvailable || addState !== "idle"}
-        className={cn(
-          "w-full h-14 flex items-center justify-center gap-3 text-sm font-bold uppercase tracking-widest transition-all duration-300",
-          addState === "added"
-            ? "bg-brand-accent text-white"
-            : isAvailable
-            ? "bg-brand-900 text-white hover:bg-brand-800 active:scale-[0.99]"
-            : "bg-brand-100 text-brand-900/40 cursor-not-allowed",
-        )}
-      >
-        {addState === "adding" && <Loader2 className="h-4 w-4 animate-spin" />}
-        {addState === "added" && <Check className="h-4 w-4" />}
-        {addState === "idle" && isAvailable && <ShoppingBag className="h-4 w-4" />}
-        {addState === "adding"
-          ? "Adding..."
-          : addState === "added"
-          ? "Added to Bag"
-          : isAvailable
-          ? "Add to Bag"
-          : "Out of Stock"}
-      </button>
+      {/* Add to Bag */}
+      <div className="py-6 flex flex-col gap-3">
+        <button
+          onClick={addToCart}
+          disabled={!isAvailable || addState !== "idle"}
+          className={cn(
+            "w-full h-14 flex items-center justify-center gap-2 text-sm font-bold uppercase tracking-widest transition-all duration-300",
+            addState === "added"
+              ? "bg-brand-accent text-white"
+              : isAvailable
+                ? "bg-brand-900 text-white hover:bg-brand-800 active:scale-[0.99]"
+                : "bg-brand-100 text-brand-900/40 cursor-not-allowed",
+          )}
+        >
+          {addState === "adding" && <Loader2 className="h-4 w-4 animate-spin" />}
+          {addState === "added" && <Check className="h-4 w-4" />}
+          {addState === "adding"
+            ? "Adding..."
+            : addState === "added"
+              ? "Added to Bag"
+              : isAvailable
+                ? "Add to Bag"
+                : "Out of Stock"}
+        </button>
 
-      {/* Description */}
+        {/* Shipping note */}
+        {isAvailable && (
+          <div className="flex items-center gap-3 px-1 py-2">
+            <Truck className="h-4 w-4 text-brand-500 shrink-0" />
+            <span className="text-xs text-brand-600">Free shipping on orders over L.E. 2,000</span>
+          </div>
+        )}
+      </div>
+
+      {/* Description accordion */}
       {product.descriptionHtml && (
-        <div className="pt-2 border-t border-brand-100">
-          <div
-            className="text-sm text-brand-800/80 leading-relaxed font-light [&>p]:mb-3 [&>ul]:list-disc [&>ul]:pl-4 [&>ul]:space-y-1"
-            dangerouslySetInnerHTML={{ __html: product.descriptionHtml }}
-          />
+        <div>
+          <button
+            onClick={() => setDescOpen((o) => !o)}
+            className="w-full flex items-center justify-between py-5 text-sm font-semibold text-brand-900 uppercase tracking-widest"
+          >
+            <span>Details</span>
+            <ChevronDown
+              className={cn("h-4 w-4 transition-transform duration-200", descOpen && "rotate-180")}
+            />
+          </button>
+          {descOpen && (
+            <div
+              className="pb-6 text-sm text-brand-700 leading-relaxed font-light [&>p]:mb-3 [&>ul]:list-disc [&>ul]:pl-5 [&>ul]:space-y-1"
+              dangerouslySetInnerHTML={{ __html: product.descriptionHtml }}
+            />
+          )}
         </div>
       )}
 
       {/* Tags */}
       {product.tags.length > 0 && (
-        <div className="flex flex-wrap gap-2 pt-1">
+        <div className="flex flex-wrap gap-2 py-5">
           {product.tags.map((tag) => (
             <span
               key={tag}
-              className="text-[10px] uppercase tracking-widest px-3 py-1 border border-brand-100 text-brand-800/60"
+              className="text-[10px] uppercase tracking-widest px-3 py-1 border border-brand-100 text-brand-800/50"
             >
               {tag}
             </span>
@@ -193,3 +215,4 @@ export function ProductDetails({ product }: { product: Product }) {
     </div>
   );
 }
+

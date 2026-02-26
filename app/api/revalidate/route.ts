@@ -18,10 +18,7 @@ function verifyShopifyWebhook(
     .digest("base64");
 
   try {
-    return crypto.timingSafeEqual(
-      Buffer.from(digest),
-      Buffer.from(hmacHeader),
-    );
+    return crypto.timingSafeEqual(Buffer.from(digest), Buffer.from(hmacHeader));
   } catch {
     return false;
   }

@@ -19,28 +19,24 @@ export default async function ProductPage({
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 md:py-12 lg:py-16">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-16">
+    <div className="min-h-screen bg-white pt-16 md:pt-20">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-[1fr_420px] lg:grid-cols-[1fr_480px] gap-0">
+        {/* Gallery — fills left column */}
         <Suspense
           fallback={
-            <div className="aspect-[3/4] bg-gray-100 animate-pulse rounded-lg" />
+            <div className="aspect-3/4 bg-brand-50 animate-pulse" />
           }
         >
           <ProductGallery images={product.images.edges.map((e) => e.node)} />
         </Suspense>
 
-        <div className="sticky top-24 self-start">
-          <Suspense
-            fallback={
-              <div className="h-64 bg-gray-100 animate-pulse rounded-lg" />
-            }
-          >
+        {/* Details — sticky right panel */}
+        <div className="md:sticky md:top-20 md:self-start md:max-h-[calc(100vh-5rem)] md:overflow-y-auto px-6 lg:px-10 py-8">
+          <Suspense fallback={<div className="h-96 animate-pulse bg-brand-50" />}>
             <ProductDetails product={product} />
           </Suspense>
         </div>
       </div>
-
-      {/* Related Products Section could go here */}
     </div>
   );
 }

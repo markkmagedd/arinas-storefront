@@ -81,7 +81,11 @@ export function ProductCard({
           {product.title}
         </h3>
         <p className="text-sm text-brand-500">
-          L.E. {priceAmount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          L.E.{" "}
+          {priceAmount.toLocaleString("en-US", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}
         </p>
       </div>
     </Link>
