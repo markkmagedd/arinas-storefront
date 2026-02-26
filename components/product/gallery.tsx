@@ -18,8 +18,7 @@ export function ProductGallery({ images }: { images: ShopifyImage[] }) {
     [images.length],
   );
 
-  if (!images.length)
-    return <div className="aspect-3/4 bg-brand-50" />;
+  if (!images.length) return <div className="aspect-3/4 bg-brand-50" />;
 
   return (
     <div className="flex flex-col gap-3">
@@ -66,7 +65,9 @@ export function ProductGallery({ images }: { images: ShopifyImage[] }) {
                   aria-label={`View image ${idx + 1}`}
                   className={cn(
                     "h-1.5 rounded-full transition-all duration-200",
-                    idx === selected ? "w-6 bg-brand-900" : "w-1.5 bg-brand-900/30",
+                    idx === selected
+                      ? "w-6 bg-brand-900"
+                      : "w-1.5 bg-brand-900/30",
                   )}
                 />
               ))}

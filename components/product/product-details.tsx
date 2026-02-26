@@ -59,7 +59,9 @@ export function ProductDetails({ product }: { product: Product }) {
       const v = edge.node;
       if (!v.availableForSale) return false;
       return v.selectedOptions.every((o) =>
-        o.name === optionName ? o.value === value : selectedOptions[o.name] === o.value,
+        o.name === optionName
+          ? o.value === value
+          : selectedOptions[o.name] === o.value,
       );
     });
 
@@ -78,14 +80,16 @@ export function ProductDetails({ product }: { product: Product }) {
     }
   };
 
-  const formattedPrice = `L.E. ${parseFloat(price.amount).toLocaleString("en-US", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`;
+  const formattedPrice = `L.E. ${parseFloat(price.amount).toLocaleString(
+    "en-US",
+    {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    },
+  )}`;
 
   return (
     <div className="flex flex-col divide-y divide-brand-100">
-
       {/* Title + Price */}
       <div className="pb-6">
         <h1 className="text-2xl md:text-3xl font-display font-bold text-brand-900 leading-snug mb-3">
@@ -108,7 +112,9 @@ export function ProductDetails({ product }: { product: Product }) {
                     {isColor ? option.name : `Select ${option.name}`}
                   </span>
                   {selectedValue && (
-                    <span className="text-sm text-brand-500">{selectedValue}</span>
+                    <span className="text-sm text-brand-500">
+                      {selectedValue}
+                    </span>
                   )}
                 </div>
 
@@ -120,7 +126,9 @@ export function ProductDetails({ product }: { product: Product }) {
                     return (
                       <button
                         key={value}
-                        onClick={() => available && handleOptionChange(option.name, value)}
+                        onClick={() =>
+                          available && handleOptionChange(option.name, value)
+                        }
                         disabled={!available}
                         title={!available ? "Out of stock" : value}
                         className={cn(
@@ -130,7 +138,8 @@ export function ProductDetails({ product }: { product: Product }) {
                             : available
                               ? "border-brand-200 text-brand-900 hover:border-brand-900 bg-white"
                               : "border-brand-100 text-brand-900/25 bg-white cursor-not-allowed",
-                          !available && "after:absolute after:inset-0 after:bg-[linear-gradient(to_top_right,transparent_calc(50%-0.5px),#e5e7eb,transparent_calc(50%+0.5px))]",
+                          !available &&
+                            "after:absolute after:inset-0 after:bg-[linear-gradient(to_top_right,transparent_calc(50%-0.5px),#e5e7eb,transparent_calc(50%+0.5px))]",
                         )}
                       >
                         {value}
@@ -158,7 +167,9 @@ export function ProductDetails({ product }: { product: Product }) {
                 : "bg-brand-100 text-brand-900/40 cursor-not-allowed",
           )}
         >
-          {addState === "adding" && <Loader2 className="h-4 w-4 animate-spin" />}
+          {addState === "adding" && (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          )}
           {addState === "added" && <Check className="h-4 w-4" />}
           {addState === "adding"
             ? "Adding..."
@@ -173,7 +184,9 @@ export function ProductDetails({ product }: { product: Product }) {
         {isAvailable && (
           <div className="flex items-center gap-3 px-1 py-2">
             <Truck className="h-4 w-4 text-brand-500 shrink-0" />
-            <span className="text-xs text-brand-600">Free shipping on orders over L.E. 2,000</span>
+            <span className="text-xs text-brand-600">
+              Free shipping on orders over L.E. 2,000
+            </span>
           </div>
         )}
       </div>
@@ -187,7 +200,10 @@ export function ProductDetails({ product }: { product: Product }) {
           >
             <span>Details</span>
             <ChevronDown
-              className={cn("h-4 w-4 transition-transform duration-200", descOpen && "rotate-180")}
+              className={cn(
+                "h-4 w-4 transition-transform duration-200",
+                descOpen && "rotate-180",
+              )}
             />
           </button>
           {descOpen && (
@@ -215,4 +231,3 @@ export function ProductDetails({ product }: { product: Product }) {
     </div>
   );
 }
-

@@ -33,7 +33,11 @@ export default async function Home() {
         {/* Product Grid from Shopify */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 gap-y-12">
           {products.slice(0, 3).map((product, i) => (
-            <ProductCard key={product.handle} product={product} isNew={i === 0} />
+            <ProductCard
+              key={product.handle}
+              product={product}
+              isNew={i === 0}
+            />
           ))}
         </div>
       </section>

@@ -20,19 +20,21 @@ export default async function ProductPage({
 
   return (
     <div className="min-h-screen bg-white pt-16 md:pt-20">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-[1fr_420px] lg:grid-cols-[1fr_480px] gap-0">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-[minmax(0,600px)_420px] lg:grid-cols-[minmax(0,640px)_480px] justify-center gap-0">
         {/* Gallery — fills left column */}
         <Suspense
-          fallback={
-            <div className="aspect-3/4 bg-brand-50 animate-pulse" />
-          }
+          fallback={<div className="aspect-3/4 bg-brand-50 animate-pulse" />}
         >
-          <ProductGallery images={product.images.edges.map((e) => e.node)} />
+          <div className="px-6 py-8 md:px-10">
+            <ProductGallery images={product.images.edges.map((e) => e.node)} />
+          </div>
         </Suspense>
 
         {/* Details — sticky right panel */}
         <div className="md:sticky md:top-20 md:self-start md:max-h-[calc(100vh-5rem)] md:overflow-y-auto px-6 lg:px-10 py-8">
-          <Suspense fallback={<div className="h-96 animate-pulse bg-brand-50" />}>
+          <Suspense
+            fallback={<div className="h-96 animate-pulse bg-brand-50" />}
+          >
             <ProductDetails product={product} />
           </Suspense>
         </div>
