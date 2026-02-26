@@ -77,7 +77,10 @@ export default async function SearchPage({
                   </p>
                 </div>
                 <span className="font-mono text-sm text-brand-900">
-                  ${parseFloat(product.priceRange.minVariantPrice.amount).toFixed(2)}
+                  $
+                  {parseFloat(
+                    product.priceRange.minVariantPrice.amount,
+                  ).toFixed(2)}
                 </span>
               </div>
             </Link>

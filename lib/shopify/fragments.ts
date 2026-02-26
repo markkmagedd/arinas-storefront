@@ -1,4 +1,3 @@
-
 export const cartFragment = /* GraphQL */ `
   fragment cart on Cart {
     id

@@ -64,12 +64,15 @@ export default async function Home() {
                     {product.title}
                   </h3>
                   <p className="text-xs text-brand-500 font-light mt-1 w-full truncate">
-                     {/* Short description or tag could go here */}
-                     Latest Collection
+                    {/* Short description or tag could go here */}
+                    Latest Collection
                   </p>
                 </div>
                 <span className="font-mono text-sm text-brand-900">
-                  ${parseFloat(product.priceRange.minVariantPrice.amount).toFixed(2)}
+                  $
+                  {parseFloat(
+                    product.priceRange.minVariantPrice.amount,
+                  ).toFixed(2)}
                 </span>
               </div>
             </Link>

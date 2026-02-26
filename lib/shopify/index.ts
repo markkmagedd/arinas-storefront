@@ -1,34 +1,34 @@
-import { 
-  getCollectionQuery, 
-  getCollectionsQuery, 
-  getProductQuery, 
-  getProductsQuery 
-} from './queries';
-import { 
-  getCartQuery, 
-  createCartMutation, 
-  addToCartMutation, 
-  removeFromCartMutation 
-} from './fragments';
-import { 
-  Collection, 
-  Connection, 
-  Product, 
-  ShopifyCollectionOperation, 
-  ShopifyCollectionsOperation, 
-  ShopifyProductOperation, 
+import {
+  getCollectionQuery,
+  getCollectionsQuery,
+  getProductQuery,
+  getProductsQuery,
+} from "./queries";
+import {
+  getCartQuery,
+  createCartMutation,
+  addToCartMutation,
+  removeFromCartMutation,
+} from "./fragments";
+import {
+  Collection,
+  Connection,
+  Product,
+  ShopifyCollectionOperation,
+  ShopifyCollectionsOperation,
+  ShopifyProductOperation,
   ShopifyProductsOperation,
   Cart,
-} from './types';
+} from "./types";
 
-const domain = process.env.SHOPIFY_STORE_DOMAIN || '';
-const accessToken = process.env.SHOPIFY_STOREFRONT_ACCESS_TOKEN || '';
+const domain = process.env.SHOPIFY_STORE_DOMAIN || "";
+const accessToken = process.env.SHOPIFY_STOREFRONT_ACCESS_TOKEN || "";
 
 async function shopifyFetch<T>({
   query,
   variables,
   headers,
-  cache = 'force-cache',
+  cache = "force-cache",
 }: {
   query: string;
   variables?: object;
@@ -36,18 +36,18 @@ async function shopifyFetch<T>({
   cache?: RequestCache;
 }): Promise<{ status: number; body: T } | never> {
   if (!domain || !accessToken) {
-    if (process.env.NODE_ENV === 'production') {
-      console.warn('Missing Shopify Environment Variables during build');
-      throw new Error('Missing Shopify Environment Variables'); 
+    if (process.env.NODE_ENV === "production") {
+      console.warn("Missing Shopify Environment Variables during build");
+      throw new Error("Missing Shopify Environment Variables");
     }
   }
 
   try {
     const result = await fetch(`https://${domain}/api/2024-01/graphql.json`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'X-Shopify-Storefront-Access-Token': accessToken,
+        "Content-Type": "application/json",
+        "X-Shopify-Storefront-Access-Token": accessToken,
         ...headers,
       },
       body: JSON.stringify({
@@ -98,7 +98,7 @@ export async function getProducts({
 
     return res.body.data.products.edges.map((edge) => edge.node);
   } catch (error) {
-    console.error('Error fetching products', error);
+    console.error("Error fetching products", error);
     return [];
   }
 }
@@ -114,7 +114,7 @@ export async function getProduct(handle: string): Promise<Product | undefined> {
 
     return res.body.data.product;
   } catch (error) {
-    console.error('Error fetching product', error);
+    console.error("Error fetching product", error);
     return undefined;
   }
 }
@@ -127,12 +127,14 @@ export async function getCollections(): Promise<Collection[]> {
 
     return res.body.data.collections.edges.map((edge) => edge.node);
   } catch (error) {
-    console.error('Error fetching collections', error);
+    console.error("Error fetching collections", error);
     return [];
   }
 }
 
-export async function getCollection(handle: string): Promise<Collection | undefined> {
+export async function getCollection(
+  handle: string,
+): Promise<Collection | undefined> {
   try {
     const res = await shopifyFetch<ShopifyCollectionOperation>({
       query: getCollectionQuery,
@@ -143,7 +145,7 @@ export async function getCollection(handle: string): Promise<Collection | undefi
 
     return res.body.data.collection;
   } catch (error) {
-    console.error('Error fetching collection', error);
+    console.error("Error fetching collection", error);
     return undefined;
   }
 }
@@ -153,32 +155,40 @@ export async function getCollection(handle: string): Promise<Collection | undefi
 export async function createCart(): Promise<Cart | undefined> {
   const res = await shopifyFetch<{ data: { cartCreate: { cart: Cart } } }>({
     query: createCartMutation,
-    cache: 'no-store'
+    cache: "no-store",
   });
   return res.body.data.cartCreate?.cart;
 }
 
-export async function addToCart(cartId: string, lines: { merchandiseId: string; quantity: number }[]): Promise<Cart | undefined> {
+export async function addToCart(
+  cartId: string,
+  lines: { merchandiseId: string; quantity: number }[],
+): Promise<Cart | undefined> {
   const res = await shopifyFetch<{ data: { cartLinesAdd: { cart: Cart } } }>({
     query: addToCartMutation,
     variables: {
       cartId,
-      lines
+      lines,
     },
-    cache: 'no-store'
+    cache: "no-store",
   });
   return res.body.data.cartLinesAdd?.cart;
 }
 
-export async function removeFromCart(cartId: string, lineIds: string[]): Promise<Cart | undefined> {
-  const res = await shopifyFetch<{ data: { cartLinesRemove: { cart: Cart } } }>({
-    query: removeFromCartMutation,
-    variables: {
-      cartId,
-      lineIds
+export async function removeFromCart(
+  cartId: string,
+  lineIds: string[],
+): Promise<Cart | undefined> {
+  const res = await shopifyFetch<{ data: { cartLinesRemove: { cart: Cart } } }>(
+    {
+      query: removeFromCartMutation,
+      variables: {
+        cartId,
+        lineIds,
+      },
+      cache: "no-store",
     },
-    cache: 'no-store'
-  });
+  );
   return res.body.data.cartLinesRemove?.cart;
 }
 
@@ -186,7 +196,7 @@ export async function getCart(cartId: string): Promise<Cart | undefined> {
   const res = await shopifyFetch<{ data: { cart: Cart } }>({
     query: getCartQuery,
     variables: { cartId },
-    cache: 'no-store'
+    cache: "no-store",
   });
   return res.body.data.cart;
 }
