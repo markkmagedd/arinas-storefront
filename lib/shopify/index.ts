@@ -5,17 +5,22 @@ import {
   getProductsQuery 
 } from './queries';
 import { 
+  getCartQuery, 
+  createCartMutation, 
+  addToCartMutation, 
+  removeFromCartMutation 
+} from './fragments';
+import { 
   Collection, 
   Connection, 
   Product, 
   ShopifyCollectionOperation, 
   ShopifyCollectionsOperation, 
   ShopifyProductOperation, 
-  ShopifyProductsOperation 
+  ShopifyProductsOperation,
+  Cart,
 } from './types';
 
-// Use optional chaining for environment variables in case they are missing during build time
-// The build might fail if we throw errors immediately at the top level
 const domain = process.env.SHOPIFY_STORE_DOMAIN || '';
 const accessToken = process.env.SHOPIFY_STOREFRONT_ACCESS_TOKEN || '';
 
@@ -30,12 +35,9 @@ async function shopifyFetch<T>({
   headers?: HeadersInit;
   cache?: RequestCache;
 }): Promise<{ status: number; body: T } | never> {
-  // Graceful handling for missing env vars during static generation or build
   if (!domain || !accessToken) {
     if (process.env.NODE_ENV === 'production') {
       console.warn('Missing Shopify Environment Variables during build');
-      // Return a mock error or empty structure if needed to prevent build crash
-      // But for now, we will throw to signal configuration error
       throw new Error('Missing Shopify Environment Variables'); 
     }
   }
@@ -144,4 +146,47 @@ export async function getCollection(handle: string): Promise<Collection | undefi
     console.error('Error fetching collection', error);
     return undefined;
   }
+}
+
+// Cart Functions
+
+export async function createCart(): Promise<Cart | undefined> {
+  const res = await shopifyFetch<{ data: { cartCreate: { cart: Cart } } }>({
+    query: createCartMutation,
+    cache: 'no-store'
+  });
+  return res.body.data.cartCreate?.cart;
+}
+
+export async function addToCart(cartId: string, lines: { merchandiseId: string; quantity: number }[]): Promise<Cart | undefined> {
+  const res = await shopifyFetch<{ data: { cartLinesAdd: { cart: Cart } } }>({
+    query: addToCartMutation,
+    variables: {
+      cartId,
+      lines
+    },
+    cache: 'no-store'
+  });
+  return res.body.data.cartLinesAdd?.cart;
+}
+
+export async function removeFromCart(cartId: string, lineIds: string[]): Promise<Cart | undefined> {
+  const res = await shopifyFetch<{ data: { cartLinesRemove: { cart: Cart } } }>({
+    query: removeFromCartMutation,
+    variables: {
+      cartId,
+      lineIds
+    },
+    cache: 'no-store'
+  });
+  return res.body.data.cartLinesRemove?.cart;
+}
+
+export async function getCart(cartId: string): Promise<Cart | undefined> {
+  const res = await shopifyFetch<{ data: { cart: Cart } }>({
+    query: getCartQuery,
+    variables: { cartId },
+    cache: 'no-store'
+  });
+  return res.body.data.cart;
 }
