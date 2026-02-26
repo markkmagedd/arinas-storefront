@@ -58,41 +58,51 @@ export default async function CollectionPage({
   }
 
   return (
-    <section className="min-h-screen bg-white">
-      {/* Page Header */}
-      <div className="border-b border-brand-100 pt-28 pb-8 px-4 sm:px-6 lg:px-8">
-        <div className="container mx-auto flex items-end justify-between">
-          <div>
-            <p className="text-xs text-brand-400 uppercase tracking-widest mb-2">Collection</p>
-            <h1 className="font-display text-4xl sm:text-5xl italic text-brand-900">
-              {title}
-            </h1>
-          </div>
-          <span className="text-sm text-brand-400 font-light pb-1">
-            {products.length} {products.length === 1 ? "item" : "items"}
-          </span>
+    <div className="min-h-screen bg-white">
+      {/* Hero Header — Alo-style full width */}
+      <div className="pt-24 pb-6 px-4 sm:px-6 lg:px-8 bg-white">
+        <div className="max-w-screen-xl mx-auto">
+          <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl italic text-brand-900 mb-2">
+            {title}
+          </h1>
+          {description && (
+            <p className="text-sm text-brand-400 max-w-md mt-2">{description}</p>
+          )}
         </div>
-        {description && (
-          <div className="container mx-auto mt-3">
-            <p className="text-sm text-brand-400 max-w-lg">{description}</p>
+      </div>
+
+      {/* Filter/Sort Bar — Lululemon style sticky bar */}
+      <div className="sticky top-[68px] z-30 bg-white border-y border-brand-100">
+        <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 h-12 flex items-center justify-between">
+          <span className="text-xs text-brand-400 uppercase tracking-widest">
+            {products.length} {products.length === 1 ? "product" : "products"}
+          </span>
+          <div className="flex items-center gap-6 text-xs text-brand-900 uppercase tracking-widest font-medium">
+            <span className="cursor-pointer hover:text-brand-500 transition-colors">Filter</span>
+            <span className="text-brand-200">|</span>
+            <span className="cursor-pointer hover:text-brand-500 transition-colors">Sort</span>
           </div>
-        )}
+        </div>
       </div>
 
       {/* Product Grid */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {products.length > 0 ? (
-          <div className="grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
-            {products.map((product) => (
-              <ProductCard key={product.id} product={product} />
+          <div className="grid grid-cols-2 gap-x-3 gap-y-10 sm:gap-x-5 lg:grid-cols-3 xl:grid-cols-4">
+            {products.map((product, i) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                isNew={handle === "new-arrivals" || i < 2}
+              />
             ))}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center py-32 text-center">
-            <p className="text-brand-300 text-sm uppercase tracking-widest">No products found</p>
+          <div className="flex flex-col items-center justify-center py-40">
+            <p className="text-brand-300 text-xs uppercase tracking-[0.3em]">No products found</p>
           </div>
         )}
       </div>
-    </section>
+    </div>
   );
 }
