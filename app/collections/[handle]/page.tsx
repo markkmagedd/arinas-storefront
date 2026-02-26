@@ -16,9 +16,9 @@ function Grid({ children }: { children: React.ReactNode }) {
 export async function generateMetadata({
   params,
 }: {
-  params: { handle: string };
+  params: Promise<{ handle: string }>;
 }) {
-  const { handle } = params;
+  const { handle } = await params;
   const collection = await getCollection(handle);
 
   if (
@@ -39,9 +39,9 @@ export async function generateMetadata({
 export default async function CollectionPage({
   params,
 }: {
-  params: { handle: string };
+  params: Promise<{ handle: string }>;
 }) {
-  const { handle } = params;
+  const { handle } = await params;
   let products = [];
   let title = "";
   let description = "";

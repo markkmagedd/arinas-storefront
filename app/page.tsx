@@ -1,8 +1,12 @@
 import { Hero } from "@/components/hero";
 import { Button, buttonVariants } from "@/components/ui/button";
 import Link from "next/link";
+import { getProducts } from "@/lib/shopify";
+import Image from "next/image";
 
 export default async function Home() {
+  const products = await getProducts({ sortKey: "CREATED_AT", reverse: true });
+
   return (
     <main className="flex flex-col items-center justify-between min-h-screen">
       {/* Hero Section */}
@@ -26,16 +30,28 @@ export default async function Home() {
           </Link>
         </div>
 
-        {/* Placeholder Product Grid if API returns nothing or we haven't integrated yet */}
+        {/* Product Grid from Shopify */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 gap-y-12">
-          {/* Mock Product Card */}
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="group cursor-pointer">
+          {products.slice(0, 3).map((product) => (
+            <Link
+              key={product.handle}
+              href={`/products/${product.handle}`}
+              className="group cursor-pointer block"
+            >
               <div className="relative aspect-[3/4] bg-brand-50 w-full overflow-hidden rounded-sm mb-4">
-                {/* Image would come from API */}
-                <div className="absolute inset-0 bg-brand-100 flex items-center justify-center text-brand-300 font-sans font-light group-hover:bg-brand-50 transition-colors">
-                  Product Image {i}
-                </div>
+                {product.featuredImage ? (
+                  <Image
+                    src={product.featuredImage.url}
+                    alt={product.featuredImage.altText || product.title}
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 33vw"
+                  />
+                ) : (
+                  <div className="absolute inset-0 bg-brand-100 flex items-center justify-center text-brand-300 font-sans font-light">
+                    No Image
+                  </div>
+                )}
                 <div className="absolute bottom-4 left-4 right-4 translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
                   <Button className="w-full bg-white text-brand-900 hover:bg-brand-50 shadow-md font-bold text-xs uppercase tracking-wider">
                     Quick Add
@@ -45,17 +61,18 @@ export default async function Home() {
               <div className="flex justify-between items-start">
                 <div>
                   <h3 className="font-sans font-medium text-brand-900 group-hover:text-brand-600 transition-colors">
-                    Pro Court Dress
+                    {product.title}
                   </h3>
-                  <p className="text-xs text-brand-500 font-light mt-1">
-                    Breathable Performance Fabric
+                  <p className="text-xs text-brand-500 font-light mt-1 w-full truncate">
+                     {/* Short description or tag could go here */}
+                     Latest Collection
                   </p>
                 </div>
                 <span className="font-mono text-sm text-brand-900">
-                  $128.00
+                  ${parseFloat(product.priceRange.minVariantPrice.amount).toFixed(2)}
                 </span>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </section>
