@@ -28,7 +28,7 @@ async function shopifyFetch<T>({
   query,
   variables,
   headers,
-  cache = "force-cache",
+  cache = "no-store",
   tags,
 }: {
   query: string;
@@ -57,7 +57,7 @@ async function shopifyFetch<T>({
         ...(variables && { variables }),
       }),
       cache,
-      next: { revalidate: 3600, ...(tags && tags.length > 0 ? { tags } : {}) },
+      next: { revalidate: 60 },
     });
 
     const body = await result.json();

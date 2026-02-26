@@ -4,8 +4,6 @@ import { ProductDetails } from "@/components/product/product-details";
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
 
-export const runtime = "edge";
-
 export default async function ProductPage({
   params,
 }: {

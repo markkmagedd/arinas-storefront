@@ -2,8 +2,6 @@ import { getCollection, getProducts } from "@/lib/shopify";
 import { ProductCard } from "@/components/product/card";
 import { notFound } from "next/navigation";
 
-export const runtime = "edge";
-
 export async function generateMetadata({
   params,
 }: {
