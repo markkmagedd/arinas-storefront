@@ -1,26 +1,55 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Product, ProductOption, ProductVariant } from "@/lib/shopify/types";
+import { Product, ProductOption } from "@/lib/shopify/types";
 import { cn } from "@/lib/utils";
-import { ShoppingBag } from "lucide-react";
+import { ShoppingBag, Loader2 } from "lucide-react";
+import { useCart } from "@/components/cart/cart-context";
+
+// Filter out Shopify's default "Title" option that appears on products with no real variants
+const HIDDEN_OPTION = "Default Title";
 
 export function ProductDetails({ product }: { product: Product }) {
-  const [selectedOptions, setSelectedOptions] = useState<
-    Record<string, string>
-  >({});
+  const { addItem } = useCart();
+  const [adding, setAdding] = useState(false);
 
-  // Helper to find variant based on selected options
-  const selectedVariant = product.variants.edges.find((edge) => {
-    return edge.node.selectedOptions.every(
-      (option) => selectedOptions[option.name] === option.value,
+  // Filter option groups that only contain the Shopify placeholder value
+  const filteredOptions = product.options.filter(
+    (o) => !(o.values.length === 1 && o.values[0] === HIDDEN_OPTION),
+  );
+
+  // Build initial selection from the first available variant
+  const buildInitialOptions = () => {
+    const firstVariant =
+      product.variants.edges.find((e) => e.node.availableForSale)?.node ??
+      product.variants.edges[0]?.node;
+    if (!firstVariant) return {};
+    return Object.fromEntries(
+      firstVariant.selectedOptions.map((o) => [o.name, o.value]),
     );
-  })?.node;
+  };
 
-  // If no variant is selected yet, default to the first available variant to check overall availability
-  const defaultVariant = product.variants.edges.find((edge) => edge.node.availableForSale)?.node || product.variants.edges[0]?.node;
-  const currentVariant = selectedVariant || defaultVariant;
+  const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>(
+    buildInitialOptions,
+  );
+
+  // Keep selection in sync if product changes (e.g. Next.js client navigation)
+  useEffect(() => {
+    setSelectedOptions(buildInitialOptions());
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product.id]);
+
+  const selectedVariant = product.variants.edges.find((edge) =>
+    edge.node.selectedOptions.every(
+      (o) => selectedOptions[o.name] === o.value,
+    ),
+  )?.node;
+
+  const currentVariant =
+    selectedVariant ??
+    product.variants.edges.find((e) => e.node.availableForSale)?.node ??
+    product.variants.edges[0]?.node;
 
   const isAvailable = currentVariant?.availableForSale ?? false;
   const price = currentVariant?.price ?? product.priceRange.minVariantPrice;
@@ -29,13 +58,14 @@ export function ProductDetails({ product }: { product: Product }) {
     setSelectedOptions((prev) => ({ ...prev, [name]: value }));
   };
 
-  const addToCart = () => {
-    if (!selectedVariant) {
-      alert("Please select all options");
-      return;
+  const addToCart = async () => {
+    if (!currentVariant) return;
+    setAdding(true);
+    try {
+      await addItem(currentVariant.id);
+    } finally {
+      setAdding(false);
     }
-    console.log("Adding to cart:", selectedVariant.id);
-    alert(`Added ${product.title} - ${selectedVariant.title} to cart`);
   };
 
   return (
@@ -50,7 +80,7 @@ export function ProductDetails({ product }: { product: Product }) {
       </div>
 
       <div className="space-y-6">
-        {product.options.map((option: ProductOption) => (
+        {filteredOptions.map((option: ProductOption) => (
           <div key={option.id}>
             <h3 className="text-sm font-bold uppercase tracking-wider text-brand-900 mb-3">
               {option.name}
@@ -82,12 +112,12 @@ export function ProductDetails({ product }: { product: Product }) {
         size="lg"
         className="w-full mt-4 h-14 text-lg"
         onClick={addToCart}
-        disabled={!isAvailable}
+        disabled={!isAvailable || adding}
       >
-        {isAvailable ? (
-          <>
-            <ShoppingBag className="mr-2 h-5 w-5" /> Add to Cart
-          </>
+        {adding ? (
+          <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Adding...</>
+        ) : isAvailable ? (
+          <><ShoppingBag className="mr-2 h-5 w-5" /> Add to Cart</>
         ) : (
           "Out of Stock"
         )}
