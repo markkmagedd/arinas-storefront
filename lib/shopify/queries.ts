@@ -188,6 +188,12 @@ export const getProductQuery = /* GraphQL */ `
               amount
               currencyCode
             }
+            image {
+              url
+              altText
+              width
+              height
+            }
           }
         }
       }

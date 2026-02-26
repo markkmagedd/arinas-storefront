@@ -1,13 +1,43 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { cn } from "@/lib/utils";
-import { Image as ShopifyImage } from "@/lib/shopify/types";
+import { Image as ShopifyImage, ProductVariant } from "@/lib/shopify/types";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 
-export function ProductGallery({ images }: { images: ShopifyImage[] }) {
+export function ProductGallery({ 
+  images, 
+  variants 
+}: { 
+  images: ShopifyImage[];
+  variants?: ProductVariant[];
+}) {
   const [selected, setSelected] = useState(0);
+  const searchParams = useSearchParams();
+
+  // Update selected image when variant changes via URL params
+  useEffect(() => {
+    if (!variants || !images.length) return;
+    
+    // Find the currently selected variant based on URL params
+    const currentVariant = variants.find((variant) => {
+      return variant.selectedOptions.every(
+        (option) => searchParams.get(option.name.toLowerCase()) === option.value
+      );
+    });
+
+    // If the variant has a specific image, find its index in the images array
+    if (currentVariant?.image) {
+      const imageIndex = images.findIndex(
+        (img) => img.url === currentVariant.image?.url
+      );
+      if (imageIndex !== -1) {
+        setSelected(imageIndex);
+      }
+    }
+  }, [searchParams, variants, images]);
 
   const prev = useCallback(
     () => setSelected((i) => (i === 0 ? images.length - 1 : i - 1)),

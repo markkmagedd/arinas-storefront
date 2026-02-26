@@ -24,7 +24,10 @@ export default async function ProductPage({
           fallback={<div className="aspect-3/4 bg-brand-50 animate-pulse" />}
         >
           <div className="px-6 py-8 md:px-10">
-            <ProductGallery images={product.images.edges.map((e) => e.node)} />
+            <ProductGallery 
+              images={product.images.edges.map((e) => e.node)} 
+              variants={product.variants.edges.map((e) => e.node)}
+            />
           </div>
         </Suspense>
 

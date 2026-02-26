@@ -5,6 +5,7 @@ import { Product, ProductOption } from "@/lib/shopify/types";
 import { cn } from "@/lib/utils";
 import { Loader2, Check, Truck, ChevronDown } from "lucide-react";
 import { useCart } from "@/components/cart/cart-context";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 
 const HIDDEN_OPTION = "Default Title";
 // Heuristic: treat options whose name contains these words as "colour" selectors
@@ -18,6 +19,9 @@ function isColorOption(name: string) {
 
 export function ProductDetails({ product }: { product: Product }) {
   const { addItem } = useCart();
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [addState, setAddState] = useState<AddState>("idle");
   const [descOpen, setDescOpen] = useState(false);
 
@@ -26,6 +30,21 @@ export function ProductDetails({ product }: { product: Product }) {
   );
 
   const buildInitialOptions = useCallback(() => {
+    // First check URL params
+    const paramsOptions: Record<string, string> = {};
+    let hasParams = false;
+    
+    filteredOptions.forEach((option) => {
+      const paramValue = searchParams.get(option.name.toLowerCase());
+      if (paramValue) {
+        paramsOptions[option.name] = paramValue;
+        hasParams = true;
+      }
+    });
+
+    if (hasParams) return paramsOptions;
+
+    // Fallback to first available variant
     const firstVariant =
       product.variants.edges.find((e) => e.node.availableForSale)?.node ??
       product.variants.edges[0]?.node;
@@ -33,7 +52,7 @@ export function ProductDetails({ product }: { product: Product }) {
     return Object.fromEntries(
       firstVariant.selectedOptions.map((o) => [o.name, o.value]),
     );
-  }, [product.id]);
+  }, [product.id, searchParams, filteredOptions]);
 
   const [selectedOptions, setSelectedOptions] =
     useState<Record<string, string>>(buildInitialOptions);
@@ -65,8 +84,15 @@ export function ProductDetails({ product }: { product: Product }) {
       );
     });
 
-  const handleOptionChange = (name: string, value: string) =>
-    setSelectedOptions((prev) => ({ ...prev, [name]: value }));
+  const handleOptionChange = (name: string, value: string) => {
+    const newOptions = { ...selectedOptions, [name]: value };
+    setSelectedOptions(newOptions);
+    
+    // Update URL params
+    const params = new URLSearchParams(searchParams.toString());
+    params.set(name.toLowerCase(), value);
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  };
 
   const addToCart = async () => {
     if (!currentVariant || addState !== "idle") return;
