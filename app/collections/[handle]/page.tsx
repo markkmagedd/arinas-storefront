@@ -66,7 +66,9 @@ export default async function CollectionPage({
             {title}
           </h1>
           {description && (
-            <p className="text-sm text-brand-400 max-w-md mt-2">{description}</p>
+            <p className="text-sm text-brand-400 max-w-md mt-2">
+              {description}
+            </p>
           )}
         </div>
       </div>
@@ -78,9 +80,13 @@ export default async function CollectionPage({
             {products.length} {products.length === 1 ? "product" : "products"}
           </span>
           <div className="flex items-center gap-6 text-xs text-brand-900 uppercase tracking-widest font-medium">
-            <span className="cursor-pointer hover:text-brand-500 transition-colors">Filter</span>
+            <span className="cursor-pointer hover:text-brand-500 transition-colors">
+              Filter
+            </span>
             <span className="text-brand-200">|</span>
-            <span className="cursor-pointer hover:text-brand-500 transition-colors">Sort</span>
+            <span className="cursor-pointer hover:text-brand-500 transition-colors">
+              Sort
+            </span>
           </div>
         </div>
       </div>
@@ -99,7 +105,9 @@ export default async function CollectionPage({
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-40">
-            <p className="text-brand-300 text-xs uppercase tracking-[0.3em]">No products found</p>
+            <p className="text-brand-300 text-xs uppercase tracking-[0.3em]">
+              No products found
+            </p>
           </div>
         )}
       </div>

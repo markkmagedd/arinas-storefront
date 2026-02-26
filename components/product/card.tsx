@@ -1,11 +1,17 @@
-'use client';
+"use client";
 
 import Link from "next/link";
 import { Product } from "@/lib/shopify/types";
 import Image from "next/image";
 import { useState } from "react";
 
-export function ProductCard({ product, isNew }: { product: Product; isNew?: boolean }) {
+export function ProductCard({
+  product,
+  isNew,
+}: {
+  product: Product;
+  isNew?: boolean;
+}) {
   const price = product.priceRange.minVariantPrice;
   const images = product.images.edges.map((e) => e.node);
   const primaryImage = images[0];
