@@ -57,7 +57,7 @@ async function shopifyFetch<T>({
         ...(variables && { variables }),
       }),
       cache,
-      next: { revalidate: 0, ...(tags && tags.length > 0 ? { tags } : {}) },
+      next: tags && tags.length > 0 ? { tags } : undefined,
     });
 
     const body = await result.json();
