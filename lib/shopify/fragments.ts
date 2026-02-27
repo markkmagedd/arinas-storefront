@@ -35,6 +35,12 @@ export const cartFragment = /* GraphQL */ `
                 name
                 value
               }
+              image {
+                url
+                altText
+                width
+                height
+              }
               product {
                 handle
                 title
@@ -43,6 +49,16 @@ export const cartFragment = /* GraphQL */ `
                   altText
                   width
                   height
+                }
+                images(first: 20) {
+                  edges {
+                    node {
+                      url
+                      altText
+                      width
+                      height
+                    }
+                  }
                 }
               }
             }

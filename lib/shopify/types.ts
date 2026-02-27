@@ -33,6 +33,7 @@ export type CartItem = {
       name: string;
       value: string;
     }[];
+    image?: Image;
     product: Product;
   };
 };

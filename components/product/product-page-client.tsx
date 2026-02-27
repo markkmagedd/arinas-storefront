@@ -17,24 +17,21 @@ export function ProductPageClient({ product }: { product: Product }) {
       variants.find((v) => v.availableForSale) ?? variants[0];
     if (!firstVariant) return {};
     return Object.fromEntries(
-      firstVariant.selectedOptions.map((o) => [o.name, o.value])
+      firstVariant.selectedOptions.map((o) => [o.name, o.value]),
     );
   }, [product.id]);
 
   const [selectedOptions, setSelectedOptions] =
     useState<Record<string, string>>(initialOptions);
 
-  const handleOptionChange = useCallback(
-    (name: string, value: string) => {
-      setSelectedOptions((prev) => ({ ...prev, [name]: value }));
-    },
-    []
-  );
+  const handleOptionChange = useCallback((name: string, value: string) => {
+    setSelectedOptions((prev) => ({ ...prev, [name]: value }));
+  }, []);
 
   // Derive selected color for gallery filtering
   const selectedColor = useMemo(() => {
     const colorOptionName = Object.keys(selectedOptions).find((name) =>
-      COLOR_KEYWORDS.some((k) => name.toLowerCase().includes(k))
+      COLOR_KEYWORDS.some((k) => name.toLowerCase().includes(k)),
     );
     return colorOptionName ? selectedOptions[colorOptionName] : null;
   }, [selectedOptions]);
@@ -45,7 +42,6 @@ export function ProductPageClient({ product }: { product: Product }) {
       <div className="px-6 py-8 md:px-10">
         <ProductGallery
           images={images}
-          variants={variants}
           selectedColor={selectedColor}
         />
       </div>

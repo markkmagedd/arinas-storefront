@@ -128,16 +128,26 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
                 {cart.lines.edges.map(({ node: item }) => (
                   <div key={item.id} className="flex gap-4">
                     <div className="h-24 w-20 bg-brand-50 relative flex-shrink-0">
-                      {item.merchandise.product.featuredImage && (
-                        <img
-                          src={item.merchandise.product.featuredImage.url}
-                          alt={
-                            item.merchandise.product.featuredImage.altText ||
-                            item.merchandise.title
-                          }
-                          className="object-cover h-full w-full"
-                        />
-                      )}
+                      {(() => {
+                        // Find the color from variant options
+                        const colorOpt = item.merchandise.selectedOptions.find(
+                          (o) => /color|colour/i.test(o.name)
+                        );
+                        const color = colorOpt?.value?.toLowerCase();
+                        // Find the first product image whose alt text contains the color
+                        const allImages = item.merchandise.product.images?.edges?.map((e) => e.node) ?? [];
+                        const matchedImage = color
+                          ? allImages.find((img) => img.altText?.toLowerCase().includes(color))
+                          : null;
+                        const displayImage = matchedImage ?? item.merchandise.image ?? item.merchandise.product.featuredImage;
+                        return displayImage ? (
+                          <img
+                            src={displayImage.url}
+                            alt={displayImage.altText || item.merchandise.title}
+                            className="object-cover h-full w-full"
+                          />
+                        ) : null;
+                      })()}
                     </div>
                     <div className="flex-1 flex flex-col justify-between py-1">
                       <div>

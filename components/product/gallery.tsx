@@ -2,59 +2,34 @@
 
 import { useState, useCallback, useEffect, useMemo } from "react";
 import { cn } from "@/lib/utils";
-import { Image as ShopifyImage, ProductVariant } from "@/lib/shopify/types";
+import { Image as ShopifyImage } from "@/lib/shopify/types";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-const COLOR_KEYWORDS = ["color", "colour", "shade", "finish", "tone"];
-
 export function ProductGallery({
   images,
-  variants,
   selectedColor,
 }: {
   images: ShopifyImage[];
-  variants?: ProductVariant[];
   selectedColor?: string | null;
 }) {
   const [selected, setSelected] = useState(0);
 
-  // Filter images to only show ones matching the selected color variant
+  // Filter images by alt text — images whose altText contains the selected
+  // color name (case-insensitive) are shown for that color.
+  // Images with no altText are shown for every color (lifestyle / shared shots).
   const filteredImages = useMemo(() => {
-    if (!variants || !variants.length || !selectedColor) return images;
+    if (!selectedColor) return images;
 
-    // Find the color option name
-    const colorOption = variants[0]?.selectedOptions.find((opt) =>
-      COLOR_KEYWORDS.some((k) => opt.name.toLowerCase().includes(k))
-    );
-    if (!colorOption) return images;
+    const colorLower = selectedColor.toLowerCase();
 
-    // Collect image URLs for variants matching the selected color
-    const colorImageUrls = new Set<string>();
-    variants.forEach((variant) => {
-      const variantColor = variant.selectedOptions.find(
-        (o) => o.name === colorOption.name
-      )?.value;
-      if (variantColor === selectedColor && variant.image?.url) {
-        colorImageUrls.add(variant.image.url);
-      }
+    const filtered = images.filter((img) => {
+      if (!img.altText) return true; // no alt text = show for all colors
+      return img.altText.toLowerCase().includes(colorLower);
     });
-
-    if (colorImageUrls.size === 0) return images;
-
-    // Collect ALL variant image URLs to identify unassigned images
-    const allVariantImageUrls = new Set<string>();
-    variants.forEach((v) => {
-      if (v.image?.url) allVariantImageUrls.add(v.image.url);
-    });
-
-    // Keep images for this color + any unassigned images
-    const filtered = images.filter(
-      (img) => colorImageUrls.has(img.url) || !allVariantImageUrls.has(img.url)
-    );
 
     return filtered.length > 0 ? filtered : images;
-  }, [images, variants, selectedColor]);
+  }, [images, selectedColor]);
 
   // Reset to first image when filtered images change (i.e. color changed)
   useEffect(() => {
