@@ -199,7 +199,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
                 <p className="text-xs text-brand-400 text-center">
                   Shipping & taxes calculated at checkout.
                 </p>
-                <Link href={cart.checkoutUrl} prefetch={false}>
+                <Link
+                  href={cart.checkoutUrl.replace(
+                    /https:\/\/(www\.)?arinas\.club/,
+                    'https://y97nft-qh.myshopify.com'
+                  )}
+                  prefetch={false}
+                >
                   <button className="w-full bg-brand-900 text-white py-4 font-bold uppercase tracking-wider hover:bg-brand-800 transition-colors shadow-lg">
                     Checkout
                   </button>
