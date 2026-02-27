@@ -5,42 +5,38 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 
-const SLIDES = ["/hero-front.png", "/hero-back.jpeg"];
-const INTERVAL = 5000; // ms between crossfades
-
 export function Hero() {
   const [loaded, setLoaded] = useState(false);
-  const [current, setCurrent] = useState(0);
+  const [isHovering, setIsHovering] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => setLoaded(true), 100);
     return () => clearTimeout(timer);
   }, []);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrent((i) => (i + 1) % SLIDES.length);
-    }, INTERVAL);
-    return () => clearInterval(interval);
-  }, []);
-
   return (
-    <section className="relative h-[90vh] w-full overflow-hidden flex items-center justify-center bg-brand-900 text-white">
+    <section
+      className="relative h-[90vh] w-full overflow-hidden flex items-center justify-center bg-brand-900 text-white"
+      onMouseEnter={() => setIsHovering(true)}
+      onMouseLeave={() => setIsHovering(false)}
+    >
       {/* Crossfading background images */}
       <div className="absolute inset-0 z-0">
-        {SLIDES.map((src, idx) => (
-          <Image
-            key={src}
-            src={src}
-            alt="Arinas hero"
-            fill
-            priority={idx === 0}
-            className={`object-cover object-top transition-opacity duration-1500 ease-in-out ${
-              idx === current ? "opacity-80" : "opacity-0"
-            }`}
-            sizes="100vw"
-          />
-        ))}
+        <Image
+          src="/hero-back.jpeg"
+          alt="Arinas hero"
+          fill
+          priority
+          className={`object-cover object-top transition-opacity duration-700 ease-in-out ${isHovering ? "opacity-0" : "opacity-80"}`}
+          sizes="100vw"
+        />
+        <Image
+          src="/hero-front.png"
+          alt="Arinas hero"
+          fill
+          className={`object-cover object-top transition-opacity duration-700 ease-in-out ${isHovering ? "opacity-80" : "opacity-0"}`}
+          sizes="100vw"
+        />
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-linear-to-t from-brand-900/60 via-brand-900/20 to-transparent z-10" />
       </div>
