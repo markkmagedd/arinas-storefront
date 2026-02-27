@@ -12,6 +12,15 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async rewrites() {
+    return [
+      {
+        // Proxy Shopify checkout requests through to Shopify
+        source: "/cart/c/:path*",
+        destination: "https://y97nft-qh.myshopify.com/cart/c/:path*",
+      },
+    ];
+  },
 };
 
 export default nextConfig;
