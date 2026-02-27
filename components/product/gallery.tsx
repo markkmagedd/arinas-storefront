@@ -5,32 +5,29 @@ import { cn } from "@/lib/utils";
 import { Image as ShopifyImage, ProductVariant } from "@/lib/shopify/types";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useSearchParams } from "next/navigation";
 
 const COLOR_KEYWORDS = ["color", "colour", "shade", "finish", "tone"];
 
-export function ProductGallery({ 
-  images, 
-  variants 
-}: { 
+export function ProductGallery({
+  images,
+  variants,
+  selectedColor,
+}: {
   images: ShopifyImage[];
   variants?: ProductVariant[];
+  selectedColor?: string | null;
 }) {
   const [selected, setSelected] = useState(0);
-  const searchParams = useSearchParams();
 
   // Filter images to only show ones matching the selected color variant
   const filteredImages = useMemo(() => {
-    if (!variants || !variants.length) return images;
+    if (!variants || !variants.length || !selectedColor) return images;
 
     // Find the color option name
     const colorOption = variants[0]?.selectedOptions.find((opt) =>
       COLOR_KEYWORDS.some((k) => opt.name.toLowerCase().includes(k))
     );
     if (!colorOption) return images;
-
-    const selectedColor = searchParams.get(colorOption.name.toLowerCase());
-    if (!selectedColor) return images;
 
     // Collect image URLs for variants matching the selected color
     const colorImageUrls = new Set<string>();
@@ -45,78 +42,52 @@ export function ProductGallery({
 
     if (colorImageUrls.size === 0) return images;
 
-    // Also include any product images not assigned to any variant (e.g. lifestyle shots)
+    // Collect ALL variant image URLs to identify unassigned images
     const allVariantImageUrls = new Set<string>();
     variants.forEach((v) => {
       if (v.image?.url) allVariantImageUrls.add(v.image.url);
     });
 
+    // Keep images for this color + any unassigned images
     const filtered = images.filter(
       (img) => colorImageUrls.has(img.url) || !allVariantImageUrls.has(img.url)
     );
 
     return filtered.length > 0 ? filtered : images;
-  }, [images, variants, searchParams]);
+  }, [images, variants, selectedColor]);
 
-  // Update selected image when variant/filtered images change
+  // Reset to first image when filtered images change (i.e. color changed)
   useEffect(() => {
-    if (!variants || !filteredImages.length) return;
-    
-    // Find the color option
-    const colorOption = variants[0]?.selectedOptions.find((opt) =>
-      COLOR_KEYWORDS.some((k) => opt.name.toLowerCase().includes(k))
-    );
-    
-    if (colorOption) {
-      const selectedColor = searchParams.get(colorOption.name.toLowerCase());
-      if (selectedColor) {
-        // Find the first variant matching this color that has an image
-        const colorVariant = variants.find((v) => {
-          const vc = v.selectedOptions.find((o) => o.name === colorOption.name)?.value;
-          return vc === selectedColor && v.image?.url;
-        });
-
-        if (colorVariant?.image) {
-          const imageIndex = filteredImages.findIndex(
-            (img) => img.url === colorVariant.image?.url
-          );
-          if (imageIndex !== -1) {
-            setSelected(imageIndex);
-            return;
-          }
-        }
-      }
-    }
-
-    // Reset to first image if current selection is out of bounds
     setSelected(0);
-  }, [searchParams, variants, filteredImages]);
+  }, [filteredImages]);
 
   const prev = useCallback(
     () => setSelected((i) => (i === 0 ? filteredImages.length - 1 : i - 1)),
-    [filteredImages.length],
+    [filteredImages.length]
   );
   const next = useCallback(
     () => setSelected((i) => (i === filteredImages.length - 1 ? 0 : i + 1)),
-    [filteredImages.length],
+    [filteredImages.length]
   );
 
   if (!filteredImages.length) return <div className="aspect-3/4 bg-brand-50" />;
+
+  const safeSelected = selected < filteredImages.length ? selected : 0;
 
   return (
     <div className="flex flex-col gap-3">
       {/* Main image + arrows */}
       <div className="relative aspect-3/4 w-full bg-brand-50 overflow-hidden group">
         <Image
-          src={filteredImages[selected]?.url ?? filteredImages[0].url}
-          alt={filteredImages[selected]?.altText || "Product image"}
+          src={filteredImages[safeSelected].url}
+          alt={filteredImages[safeSelected].altText || "Product image"}
           fill
           priority
           className="object-cover transition-opacity duration-300"
           sizes="(max-width: 768px) 100vw, 55vw"
         />
 
-        {/* Prev */}
+        {/* Prev / Next */}
         {filteredImages.length > 1 && (
           <>
             <button
@@ -128,7 +99,6 @@ export function ProductGallery({
               <ChevronLeft className="h-5 w-5 text-brand-900" />
             </button>
 
-            {/* Next */}
             <button
               onClick={next}
               aria-label="Next image"
@@ -148,9 +118,9 @@ export function ProductGallery({
                   aria-label={`View image ${idx + 1}`}
                   className={cn(
                     "h-1.5 rounded-full transition-all duration-200",
-                    idx === selected
+                    idx === safeSelected
                       ? "w-6 bg-brand-900"
-                      : "w-1.5 bg-brand-900/30",
+                      : "w-1.5 bg-brand-900/30"
                   )}
                 />
               ))}
@@ -170,9 +140,9 @@ export function ProductGallery({
               aria-label={`View image ${idx + 1}`}
               className={cn(
                 "relative w-16 h-20 shrink-0 overflow-hidden transition-all duration-150",
-                idx === selected
+                idx === safeSelected
                   ? "ring-1 ring-brand-900 opacity-100"
-                  : "ring-1 ring-transparent opacity-50 hover:opacity-80",
+                  : "ring-1 ring-transparent opacity-50 hover:opacity-80"
               )}
             >
               <Image
