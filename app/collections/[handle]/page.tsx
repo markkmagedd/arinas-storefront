@@ -1,5 +1,6 @@
 import { getCollection, getProducts } from "@/lib/shopify";
 import { ProductCard } from "@/components/product/card";
+import { FadeIn } from "@/components/ui/fade-in";
 import { notFound } from "next/navigation";
 
 export async function generateMetadata({
@@ -94,11 +95,12 @@ export default async function CollectionPage({
         {products.length > 0 ? (
           <div className="grid grid-cols-2 gap-x-3 gap-y-10 sm:gap-x-5 lg:grid-cols-3 xl:grid-cols-4">
             {products.map((product, i) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                isNew={handle === "new-arrivals" || i < 2}
-              />
+              <FadeIn key={product.id} delay={i * 100} duration={600}>
+                <ProductCard
+                  product={product}
+                  isNew={handle === "new-arrivals" || i < 2}
+                />
+              </FadeIn>
             ))}
           </div>
         ) : (
