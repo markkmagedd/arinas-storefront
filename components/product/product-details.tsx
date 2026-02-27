@@ -95,9 +95,11 @@ export function ProductDetails({ product }: { product: Product }) {
     const newOptions = { ...selectedOptions, [name]: value };
     setSelectedOptions(newOptions);
 
-    // Update URL params
-    const params = new URLSearchParams(searchParams.toString());
-    params.set(name.toLowerCase(), value);
+    // Update ALL selected options in URL params so gallery can match the full variant
+    const params = new URLSearchParams();
+    Object.entries(newOptions).forEach(([key, val]) => {
+      params.set(key.toLowerCase(), val);
+    });
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
   };
 

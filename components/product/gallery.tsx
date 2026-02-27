@@ -62,21 +62,32 @@ export function ProductGallery({
   useEffect(() => {
     if (!variants || !filteredImages.length) return;
     
-    const currentVariant = variants.find((variant) => {
-      return variant.selectedOptions.every(
-        (option) => searchParams.get(option.name.toLowerCase()) === option.value
-      );
-    });
+    // Find the color option
+    const colorOption = variants[0]?.selectedOptions.find((opt) =>
+      COLOR_KEYWORDS.some((k) => opt.name.toLowerCase().includes(k))
+    );
+    
+    if (colorOption) {
+      const selectedColor = searchParams.get(colorOption.name.toLowerCase());
+      if (selectedColor) {
+        // Find the first variant matching this color that has an image
+        const colorVariant = variants.find((v) => {
+          const vc = v.selectedOptions.find((o) => o.name === colorOption.name)?.value;
+          return vc === selectedColor && v.image?.url;
+        });
 
-    if (currentVariant?.image) {
-      const imageIndex = filteredImages.findIndex(
-        (img) => img.url === currentVariant.image?.url
-      );
-      if (imageIndex !== -1) {
-        setSelected(imageIndex);
-        return;
+        if (colorVariant?.image) {
+          const imageIndex = filteredImages.findIndex(
+            (img) => img.url === colorVariant.image?.url
+          );
+          if (imageIndex !== -1) {
+            setSelected(imageIndex);
+            return;
+          }
+        }
       }
     }
+
     // Reset to first image if current selection is out of bounds
     setSelected(0);
   }, [searchParams, variants, filteredImages]);
