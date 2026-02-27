@@ -56,7 +56,10 @@ export function Header() {
       <div className="container mx-auto px-4 md:px-6 flex items-center justify-between relative">
         {/* Mobile Menu Trigger */}
         <button
-          className={cn("md:hidden p-2 -ml-2", isTransparent ? "text-white" : "text-brand-900")}
+          className={cn(
+            "md:hidden p-2 -ml-2",
+            isTransparent ? "text-white" : "text-brand-900",
+          )}
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
           <Menu className="h-6 w-6" />
@@ -69,7 +72,10 @@ export function Header() {
             alt="Arinas"
             width={180}
             height={60}
-            className={cn("h-16 md:h-20 w-auto object-contain transition-all duration-500", isTransparent && "brightness-0 invert")}
+            className={cn(
+              "h-16 md:h-20 w-auto object-contain transition-all duration-500",
+              isTransparent && "brightness-0 invert",
+            )}
             priority
           />
         </Link>
@@ -78,25 +84,45 @@ export function Header() {
         <nav className="hidden md:flex items-center gap-8">
           <Link
             href="/collections/all"
-            className={cn("text-sm font-medium tracking-wide uppercase transition-colors", isTransparent ? "text-white hover:text-white/70" : "hover:text-brand-500")}
+            className={cn(
+              "text-sm font-medium tracking-wide uppercase transition-colors",
+              isTransparent
+                ? "text-white hover:text-white/70"
+                : "hover:text-brand-500",
+            )}
           >
             Shop All
           </Link>
           <Link
             href="/collections/new-arrivals"
-            className={cn("text-sm font-medium tracking-wide uppercase transition-colors", isTransparent ? "text-white hover:text-white/70" : "hover:text-brand-500")}
+            className={cn(
+              "text-sm font-medium tracking-wide uppercase transition-colors",
+              isTransparent
+                ? "text-white hover:text-white/70"
+                : "hover:text-brand-500",
+            )}
           >
             New Arrivals
           </Link>
           <Link
             href="/collections/best-sellers"
-            className={cn("text-sm font-medium tracking-wide uppercase transition-colors", isTransparent ? "text-white hover:text-white/70" : "hover:text-brand-500")}
+            className={cn(
+              "text-sm font-medium tracking-wide uppercase transition-colors",
+              isTransparent
+                ? "text-white hover:text-white/70"
+                : "hover:text-brand-500",
+            )}
           >
             Best Sellers
           </Link>
           <Link
             href="/about"
-            className={cn("text-sm font-medium tracking-wide uppercase transition-colors", isTransparent ? "text-white hover:text-white/70" : "hover:text-brand-500")}
+            className={cn(
+              "text-sm font-medium tracking-wide uppercase transition-colors",
+              isTransparent
+                ? "text-white hover:text-white/70"
+                : "hover:text-brand-500",
+            )}
           >
             Our Story
           </Link>
@@ -123,7 +149,12 @@ export function Header() {
             </form>
           ) : (
             <button
-              className={cn("p-2 transition-colors hidden sm:block", isTransparent ? "text-white hover:text-white/70" : "text-brand-900 hover:text-brand-600")}
+              className={cn(
+                "p-2 transition-colors hidden sm:block",
+                isTransparent
+                  ? "text-white hover:text-white/70"
+                  : "text-brand-900 hover:text-brand-600",
+              )}
               onClick={() => setIsSearchOpen(true)}
             >
               <Search className="h-5 w-5" />
@@ -132,12 +163,22 @@ export function Header() {
 
           <Link
             href="/account"
-            className={cn("p-2 transition-colors hidden sm:block", isTransparent ? "text-white hover:text-white/70" : "text-brand-900 hover:text-brand-600")}
+            className={cn(
+              "p-2 transition-colors hidden sm:block",
+              isTransparent
+                ? "text-white hover:text-white/70"
+                : "text-brand-900 hover:text-brand-600",
+            )}
           >
             <User className="h-5 w-5" />
           </Link>
           <button
-            className={cn("p-2 transition-colors relative", isTransparent ? "text-white hover:text-white/70" : "text-brand-900 hover:text-brand-600")}
+            className={cn(
+              "p-2 transition-colors relative",
+              isTransparent
+                ? "text-white hover:text-white/70"
+                : "text-brand-900 hover:text-brand-600",
+            )}
             onClick={openCart}
           >
             <ShoppingBag className="h-5 w-5" />

@@ -46,9 +46,7 @@ export function Hero() {
         <h1 className="font-display font-black italic uppercase text-5xl md:text-7xl lg:text-8xl tracking-tighter leading-[0.9] drop-shadow-lg">
           <span
             className={`inline-block transition-all duration-700 ease-out delay-200 ${
-              loaded
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 translate-y-8"
+              loaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
             }`}
           >
             Look Sharp.
@@ -57,9 +55,7 @@ export function Hero() {
           {/* Line 2: "Play Sharper." */}
           <span
             className={`inline-block text-brand-50 transition-all duration-700 ease-out delay-500 ${
-              loaded
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 translate-y-8"
+              loaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
             }`}
           >
             Play Sharper.
