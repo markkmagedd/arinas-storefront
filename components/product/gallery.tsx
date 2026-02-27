@@ -38,11 +38,11 @@ export function ProductGallery({
 
   const prev = useCallback(
     () => setSelected((i) => (i === 0 ? filteredImages.length - 1 : i - 1)),
-    [filteredImages.length]
+    [filteredImages.length],
   );
   const next = useCallback(
     () => setSelected((i) => (i === filteredImages.length - 1 ? 0 : i + 1)),
-    [filteredImages.length]
+    [filteredImages.length],
   );
 
   if (!filteredImages.length) return <div className="aspect-3/4 bg-brand-50" />;
@@ -95,7 +95,7 @@ export function ProductGallery({
                     "h-1.5 rounded-full transition-all duration-200",
                     idx === safeSelected
                       ? "w-6 bg-brand-900"
-                      : "w-1.5 bg-brand-900/30"
+                      : "w-1.5 bg-brand-900/30",
                   )}
                 />
               ))}
@@ -117,7 +117,7 @@ export function ProductGallery({
                 "relative w-16 h-20 shrink-0 overflow-hidden transition-all duration-150",
                 idx === safeSelected
                   ? "ring-1 ring-brand-900 opacity-100"
-                  : "ring-1 ring-transparent opacity-50 hover:opacity-80"
+                  : "ring-1 ring-transparent opacity-50 hover:opacity-80",
               )}
             >
               <Image

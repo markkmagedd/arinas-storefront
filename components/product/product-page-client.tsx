@@ -40,10 +40,7 @@ export function ProductPageClient({ product }: { product: Product }) {
     <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-[minmax(0,600px)_420px] lg:grid-cols-[minmax(0,640px)_480px] justify-center gap-0">
       {/* Gallery — fills left column */}
       <div className="px-6 py-8 md:px-10">
-        <ProductGallery
-          images={images}
-          selectedColor={selectedColor}
-        />
+        <ProductGallery images={images} selectedColor={selectedColor} />
       </div>
 
       {/* Details — sticky right panel */}
